@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String   @id @unique
+  email         String   @unique
+  firstName     String? // ตรวจสอบว่ามีฟิลด์นี้
+  lastName      String? // ตรวจสอบว่ามีฟิลด์นี้
+
+  walletBalance Decimal  @default(0.00) @db.Decimal(10, 2)
+  roleId        Int?
+  createdAt     DateTime @default(now()) @db.Timestamp(6)
+  imageUrl      String?
+  Artworks     Artwork[]
+  Bids         Bid[]
+  BlogPosts    Blog[]
+  Cart         Cart?
+  Comments     Comment[]
+  Orders       Order[]
+  Transactions Transaction[]
+  History      History[]
+  Profile      Profile?
+  Role         Role?         @relation(fields: [roleId], references: [id], onUpdate: Restrict, onDelete: Restrict)
+}
+
+model Artwork {
+  id                String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId            String? // เปลี่ยนเป็น String
+  title             String
+  description       String?
+  categoryId        Int?
+  typeId            Int?
+  price             Decimal?      @db.Decimal(10, 2)
+  auctionStartPrice Decimal?      @db.Decimal(10, 2)
+  auctionStartAt    DateTime?     @db.Timestamp(6)
+  auctionEndAt      DateTime?     @db.Timestamp(6)
+  highestBid        Decimal?      @db.Decimal(10, 2)
+  status            ArtworkStatus @default(ACTIVE)
+  imageUrl          String
+  createdAt         DateTime      @default(now()) @db.Timestamp(6)
+
+  User        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Category    Category?    @relation(fields: [categoryId], references: [id], onUpdate: Restrict)
+  ArtworkType ArtworkType? @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  Bids        Bid[]
+  CartItems   CartItem[]
+  OrderItems  OrderItem[]
+  History     History[]
+}
+
+enum ArtworkStatus {
+  ACTIVE
+  AUCTION_ENDED
+  SOLD
+  ARCHIVED
+}
+
+model Bid {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  artworkId String   @db.Uuid
+  userId    String // เปลี่ยนเป็น String
+  amount    Decimal  @db.Decimal(10, 2)
+  isWinning Boolean  @default(false)
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+
+  Artwork Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+  User    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([artworkId, isWinning])
+}
+
+model Blog {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  content     String
+  publishedAt DateTime? @default(now()) @db.Timestamp(6)
+  authorId    String? // เปลี่ยนเป็น String
+
+  User     User?     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  Comments Comment[]
+}
+
+model Cart {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String?  @unique // เปลี่ยนเป็น String
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @default(now()) @db.Timestamp(6)
+
+  User      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  CartItems CartItem[]
+}
+
+model CartItem {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cartId    String?  @db.Uuid
+  artworkId String?  @db.Uuid
+  quantity  Int      @default(1)
+  addedAt   DateTime @default(now()) @db.Timestamp(6)
+
+  Cart    Cart?    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  Artwork Artwork? @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @db.Timestamp(6)
+
+  Artworks Artwork[]
+}
+
+model Comment {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId          String?  @db.Uuid
+  userId          String? // เปลี่ยนเป็น String
+  content         String
+  createdAt       DateTime @default(now()) @db.Timestamp(6)
+  parentCommentId String?  @db.Uuid
+
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Blog Blog? @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String? // เปลี่ยนเป็น String
+  totalPrice Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+
+  User       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  OrderItems OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId   String? @db.Uuid
+  artworkId String? @db.Uuid
+  price     Decimal @db.Decimal(10, 2)
+  quantity  Int     @default(1)
+
+  Order   Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  Artwork Artwork? @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+}
+
+model Profile {
+  id           String   @id // String ID for Clerk
+  displayName  String?
+  bio          String?
+  profileImage String?
+  updatedAt    DateTime @default(now()) @db.Timestamp(6)
+
+  User User @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  Users       User[]
+}
+
+model Transaction {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String? // เชื่อมกับผู้ใช้งาน
+  transactionType TransactionType? // DEPOSIT หรือ WITHDRAWAL
+  amount          Decimal          @db.Decimal(10, 2) // จำนวนที่ผู้ใช้ได้รับในวอลเลท
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  status    TransactionStatus? // PENDING, COMPLETED, FAILED, CANCELLED  
+
+  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum TransactionType {
+  DEPOSIT // ฝากเงิน
+  WITHDRAWAL // ถอนเงิน
+}
+
+model History {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String? // เชื่อมกับผู้ใช้งาน
+  actionType  ActionType // PURCHASE, BID, หรืออื่น ๆ
+  artworkId   String?    @db.Uuid // เชื่อมกับภาพที่เกี่ยวข้อง
+  amount      Decimal?   @db.Decimal(10, 2) // ราคาซื้อ/เสนอราคา
+  downloadUrl String? // ลิงก์สำหรับดาวน์โหลดไฟล์ภาพ (กรณีเป็นการซื้อภาพ)
+  createdAt   DateTime   @default(now()) @db.Timestamp(6)
+
+  User    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Artwork Artwork? @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+}
+
+enum ActionType {
+  PURCHASE // ซื้อภาพ
+  BID // การประมูล
+}
+
+model ArtworkType {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  Artworks    Artwork[]
+}

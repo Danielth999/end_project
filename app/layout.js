@@ -1,6 +1,12 @@
 import localFont from "next/font/local";
 import "./globals.css";
-
+import Provider from "@/components/Provider";
+import Navbar from "@/components/Navbar/Navbar";
+import Sidebar from "@/components/Sidebar/Sidebar";
+import { ClerkProvider } from "@clerk/nextjs";
+import { Suspense } from "react";
+import Loading from "./loading";
+import Footer from "@/components/Footer/Footer";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -19,12 +25,35 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <ClerkProvider>
+      <html
+        className="scroll-smooth focus:scroll-auto"
+        lang="en"
+        suppressHydrationWarning
       >
-        {children}
-      </body>
-    </html>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-gray-900 via-gray-800`}
+        >
+          <Provider>
+            <div className="flex flex-col sm:flex-row min-h-screen">
+              {/* Sidebar (สำหรับขนาดหน้าจอใหญ่) */}
+              <div className="sm:flex  hidden mr-10 sm:mx-4 ">
+                <Sidebar />
+              </div>
+              {/* เนื้อหาหลัก */}
+              <div className="flex-1 mx-auto w-full max-w-[1400px]">
+                {/* Navbar */}
+                <Navbar />
+                {/* ส่วนของเนื้อหาหลัก */}
+                <main className="mt-4 sm:mt-6 ">
+                  <Suspense fallback={<Loading />}>{children}</Suspense>
+                </main>
+              </div>
+            </div>
+            <Footer/>
+          </Provider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
