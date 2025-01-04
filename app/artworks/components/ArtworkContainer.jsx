@@ -1,4 +1,4 @@
-import ProductsCard from "./ProductsCard";
+import ProductsCard from "./ArtworkCard";
 async function fetchProducts() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/artworks`);
   return res.json();
@@ -16,7 +16,7 @@ const ProductsContainer = async () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {data.map((item) => (
-          <ProductsCard key={item.id} item={item} />
+          <ProductsCard key={item.id} artWorks={item} />
         ))}
       </div>
     </>

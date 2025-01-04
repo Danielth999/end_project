@@ -51,7 +51,7 @@ const Profile = () => {
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href="/transactions">ประวัติการสั่งซื้อ</Link>
+          <Link href="/transactions">ประวัติการทำธุรกรรม</Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>

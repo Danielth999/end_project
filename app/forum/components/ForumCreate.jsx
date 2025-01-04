@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,11 +50,13 @@ const ForumCreate = ({ create, newPost, setNewPost }) => {
             className="w-full bg-transparent border-white text-white placeholder-gray-300"
           />
           {imagePreview && (
-            <div className="mt-4">
-              <img
+            <div className="mt-4 relative w-full h-48 rounded-lg overflow-hidden">
+              <Image
                 src={imagePreview}
                 alt="Preview"
-                className="w-full h-48 object-cover rounded-lg"
+                layout="fill"
+                objectFit="cover"
+                className="rounded-lg"
               />
             </div>
           )}
@@ -67,4 +70,3 @@ const ForumCreate = ({ create, newPost, setNewPost }) => {
 };
 
 export default ForumCreate;
-  

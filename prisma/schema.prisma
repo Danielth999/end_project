@@ -9,25 +9,32 @@ datasource db {
 }
 
 model User {
-  id            String   @id @unique
-  email         String   @unique
+  id            String        @id @unique
+  email         String        @unique
   firstName     String? // ตรวจสอบว่ามีฟิลด์นี้
   lastName      String? // ตรวจสอบว่ามีฟิลด์นี้
-
-  walletBalance Decimal  @default(0.00) @db.Decimal(10, 2)
+  walletBalance Decimal       @default(0.00) @db.Decimal(10, 2)
   roleId        Int?
-  createdAt     DateTime @default(now()) @db.Timestamp(6)
+  createdAt     DateTime      @default(now()) @db.Timestamp(6)
   imageUrl      String?
-  Artworks     Artwork[]
-  Bids         Bid[]
-  BlogPosts    Blog[]
-  Cart         Cart?
-  Comments     Comment[]
-  Orders       Order[]
-  Transactions Transaction[]
-  History      History[]
-  Profile      Profile?
-  Role         Role?         @relation(fields: [roleId], references: [id], onUpdate: Restrict, onDelete: Restrict)
+  salesCount    Int           @default(0) // New field for tracking sales count
+  Artworks      Artwork[]
+  Bids          Bid[]
+  BlogPosts     Blog[]
+  Cart          Cart?
+  Comments      Comment[]
+  Orders        Order[]
+  Transactions  Transaction[]
+  History       History[]
+  Profile       Profile?
+  Role          Role?         @relation(fields: [roleId], references: [id], onUpdate: Restrict, onDelete: Restrict)
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  Users       User[]
 }
 
 model Artwork {
@@ -74,6 +81,24 @@ model Bid {
   User    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([artworkId, isWinning])
+}
+
+model History {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String? // เชื่อมกับผู้ใช้งาน
+  actionType  ActionType // PURCHASE, BID, หรืออื่น ๆ
+  artworkId   String?    @db.Uuid // เชื่อมกับภาพที่เกี่ยวข้อง
+  amount      Decimal?   @db.Decimal(10, 2) // ราคาซื้อ/เสนอราคา
+  downloadUrl String? // ลิงก์สำหรับดาวน์โหลดไฟล์ภาพ (กรณีเป็นการซื้อภาพ)
+  createdAt   DateTime   @default(now()) @db.Timestamp(6)
+
+  User    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Artwork Artwork? @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+}
+
+enum ActionType {
+  PURCHASE // ซื้อภาพ
+  BID // การประมูล
 }
 
 model Blog {
@@ -160,20 +185,13 @@ model Profile {
   User User @relation(fields: [id], references: [id], onDelete: Cascade)
 }
 
-model Role {
-  id          Int     @id @default(autoincrement())
-  name        String  @unique
-  description String?
-  Users       User[]
-}
-
 model Transaction {
-  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id              String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId          String? // เชื่อมกับผู้ใช้งาน
   transactionType TransactionType? // DEPOSIT หรือ WITHDRAWAL
-  amount          Decimal          @db.Decimal(10, 2) // จำนวนที่ผู้ใช้ได้รับในวอลเลท
-  createdAt DateTime @default(now()) @db.Timestamp(6)
-  status    TransactionStatus? // PENDING, COMPLETED, FAILED, CANCELLED  
+  amount          Decimal            @db.Decimal(10, 2) // จำนวนที่ผู้ใช้ได้รับในวอลเลท
+  createdAt       DateTime           @default(now()) @db.Timestamp(6)
+  status          TransactionStatus? // PENDING, COMPLETED, FAILED, CANCELLED  
 
   User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -188,24 +206,6 @@ enum TransactionStatus {
 enum TransactionType {
   DEPOSIT // ฝากเงิน
   WITHDRAWAL // ถอนเงิน
-}
-
-model History {
-  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId      String? // เชื่อมกับผู้ใช้งาน
-  actionType  ActionType // PURCHASE, BID, หรืออื่น ๆ
-  artworkId   String?    @db.Uuid // เชื่อมกับภาพที่เกี่ยวข้อง
-  amount      Decimal?   @db.Decimal(10, 2) // ราคาซื้อ/เสนอราคา
-  downloadUrl String? // ลิงก์สำหรับดาวน์โหลดไฟล์ภาพ (กรณีเป็นการซื้อภาพ)
-  createdAt   DateTime   @default(now()) @db.Timestamp(6)
-
-  User    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Artwork Artwork? @relation(fields: [artworkId], references: [id], onDelete: Cascade)
-}
-
-enum ActionType {
-  PURCHASE // ซื้อภาพ
-  BID // การประมูล
 }
 
 model ArtworkType {

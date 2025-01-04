@@ -4,10 +4,10 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const artworks = await prisma.artworks.findMany({
+    const artworks = await prisma.artwork.findMany({
       include: {
-        users: true,
-        categories: true,
+        User: true,
+        Category: true,
       },
     });
     return Response.json(artworks);

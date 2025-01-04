@@ -1,4 +1,4 @@
-import ProductDetail from "../components/ProductDetail";
+import ProductDetail from "../components/ArtworkDetail";
 
 async function fetchProduct(id) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/artworks/${id}`);

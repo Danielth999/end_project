@@ -18,12 +18,11 @@ export async function GET(req) {
     // Fetch artworks
     const artworks = await prisma.artworks.findMany({
       where: {
-        clerk_id: user.id,
+        id: user.id,
       },
       include: {
-        categories: true,
-        artwork_types: true,
-        users: true,
+        Category: true,
+        User: true,
       },
     });
 

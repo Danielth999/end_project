@@ -37,6 +37,11 @@ const nextConfig = {
         hostname: "lh3.googleusercontent.com", // Allow loading images from Google Photos
         pathname: "/**", // Allow all paths
       },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com", // Allow loading images from Pexels
+        pathname: "/**", // Allow all paths of images.pexels.com
+      },
     ],
   },
 };

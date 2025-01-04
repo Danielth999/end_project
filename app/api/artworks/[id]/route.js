@@ -1,13 +1,13 @@
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req, { params }) {
-  const {id} = params;
+  const { id } = params;
   try {
-    const artworks = await prisma.artworks.findUnique({
+    const artworks = await prisma.Artwork.findUnique({
       where: { id: id },
-      include: { categories: true, users: true, artwork_types: true },
+      include: { Category: true, User: true, ArtworkType: true },
     });
-
+                                    
     if (!artworks) {
       return Response.json({ error: "Product not found" }, { status: 404 });
     }

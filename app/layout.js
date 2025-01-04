@@ -50,7 +50,9 @@ export default function RootLayout({ children }) {
                 </main>
               </div>
             </div>
-            <Footer/>
+            <div className="mt-10">
+              <Footer />
+            </div>
           </Provider>
         </body>
       </html>

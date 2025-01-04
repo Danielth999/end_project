@@ -32,7 +32,7 @@ function BlogPost({ post }) {
           fill
           sizes="100vw"
           priority
-          className="  object-cover rounded-lg"
+          className="object-cover rounded-lg"
         />
       </div>
       <div className="p-6">
@@ -207,11 +207,15 @@ export default function AdminBlog() {
                       className="w-full bg-gray-800 border-gray-700 text-white"
                     />
                     {imagePreview && (
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-full h-48 object-cover rounded-lg mt-4"
-                      />
+                      <div className="relative w-full h-48 mt-4 rounded-lg overflow-hidden">
+                        <Image
+                          src={imagePreview}
+                          alt="Preview"
+                          layout="fill"
+                          objectFit="cover"
+                          className="rounded-lg"
+                        />
+                      </div>
                     )}
                     <Button
                       type="submit"

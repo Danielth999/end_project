@@ -1,6 +1,5 @@
 import { ThemeProvider } from "@/components/theme-provider";
-
-import { Toaster } from "@/components/ui/toaster";
+import {  Toaster } from "react-hot-toast";
 
 const Providers = ({ children }) => {
   return (

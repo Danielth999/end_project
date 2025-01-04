@@ -1,20 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ArrowUpCircle, ArrowDownCircle, Upload, X } from "lucide-react";
-import { format } from "date-fns";
-import { th } from "date-fns/locale";
-import axios from "axios";
-import Loading from "@/components/Loading";
+import useSWR from "swr";
 import Swal from "sweetalert2";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import Loading from "@/components/Loading";
 import {
   Card,
   CardContent,
@@ -22,96 +10,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import TransactionList from "./TransactionList";
+import UploadSlipModal from "./UploadSlipModal";
+import CancelConfirmationDialog from "./CancelConfirmationDialog";
+import fetcher from "@/lib/fetcher";
+import { useState } from "react";
 
-export default function TransactionsPage({ userId }) {
-  const [transactions, setTransactions] = useState([]); // State for transactions data
-  const [isLoading, setIsLoading] = useState(true); // State for loading indicator
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-  const [selectedTransaction, setSelectedTransaction] = useState(null); // State for selected transaction
-  const [slipFile, setSlipFile] = useState(null); // State for uploaded slip file
-  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false); // State for cancel confirmation dialog
+export default function Transactions({ userId }) {
+  const { data: transactions, error, isLoading, mutate } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${userId}`,
+    fetcher
+  );
 
-  // Fetch transactions from API
-  const fetchTransactions = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${userId}`
-      );
-      setTransactions(response.data);
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
-
-  const formatAmount = (amount, type) => {
-    // Format transaction amount with currency symbol
-    const formattedAmount = new Intl.NumberFormat("th-TH", {
-      style: "currency",
-      currency: "THB",
-    }).format(amount);
-    return type === "DEPOSIT" ? `+${formattedAmount}` : `-${formattedAmount}`;
-  };
-
-  const getStatusColor = (status) => {
-    // Determine badge color based on status
-    switch (status.toUpperCase()) {
-      case "PENDING":
-        return "bg-yellow-500 hover:bg-yellow-600";
-      case "COMPLETED":
-        return "bg-green-500 hover:bg-green-600";
-      case "FAILED":
-        return "bg-red-500 hover:bg-red-600";
-      case "CANCELLED":
-        return "bg-gray-500 hover:bg-gray-600";
-      default:
-        return "bg-gray-500 hover:bg-gray-600";
-    }
-  };
-
-  const translateStatus = (status) => {
-    // Translate status into Thai
-    switch (status.toUpperCase()) {
-      case "PENDING":
-        return "รอดำเนินการ";
-      case "COMPLETED":
-        return "สำเร็จ";
-      case "FAILED":
-        return "ล้มเหลว";
-      case "CANCELLED":
-        return "ยกเลิก";
-      default:
-        return "ไม่ทราบสถานะ";
-    }
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
 
   const handleOpenModal = (transaction) => {
     setSelectedTransaction(transaction);
@@ -121,31 +34,14 @@ export default function TransactionsPage({ userId }) {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedTransaction(null);
-    setSlipFile(null);
   };
 
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSlipFile(e.target.files[0]);
-    }
-  };
-
-  // Upload slip function
-  const handleSubmitSlip = async (e) => {
-    e.preventDefault();
-
-    if (!slipFile) {
-      Swal.fire({
-        icon: "error",
-        title: "ข้อผิดพลาด",
-        text: "กรุณาอัปโหลดสลิป!",
-      });
-      return;
-    }
+  const handleSubmitSlip = async (slipFile) => {
+    if (!selectedTransaction) return;
 
     const formData = new FormData();
     formData.append("files", slipFile);
-    formData.append("log", true); // ระบุว่าให้ตรวจสลิปซ้ำ
+    // formData.append("log", true); //ตรวจสอบสลิปซ้ำ
 
     try {
       Swal.fire({
@@ -165,7 +61,7 @@ export default function TransactionsPage({ userId }) {
         body: formData,
       });
 
-      handleCloseModal(); // Close the modal after uploading slip
+      handleCloseModal();
 
       const result = await response.json();
       console.log("Slip upload result:", result);
@@ -174,7 +70,6 @@ export default function TransactionsPage({ userId }) {
         const slipAmount = parseFloat(result.data.amount);
         const selectedAmount = parseFloat(selectedTransaction.amount);
 
-        // Validate slip amount
         if (selectedAmount !== slipAmount) {
           Swal.fire({
             icon: "error",
@@ -184,14 +79,18 @@ export default function TransactionsPage({ userId }) {
           return;
         }
 
-        // Request to update the wallet balance
-        await axios.put(
+        await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/${userId}`,
-          { amount: slipAmount }
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: slipAmount }),
+          }
         );
 
-        await axios.put(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${selectedTransaction.id}`
+        await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${selectedTransaction.id}`,
+          { method: "PUT" }
         );
 
         Swal.fire({
@@ -200,8 +99,7 @@ export default function TransactionsPage({ userId }) {
           text: "สลิปของคุณได้รับการตรวจสอบเรียบร้อย",
         });
 
-        // Refresh transactions after successful upload
-        fetchTransactions();
+        mutate(); // Refresh transactions data
       } else {
         Swal.fire({
           icon: "error",
@@ -232,17 +130,18 @@ export default function TransactionsPage({ userId }) {
         },
       });
 
-      const response = await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${selectedTransaction.id}`
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${selectedTransaction.id}`,
+        { method: "DELETE" }
       );
 
-      if (response.status === 200) {
+      if (response.ok) {
         Swal.fire({
           icon: "success",
           title: "ยกเลิกรายการสำเร็จ",
           text: "รายการของคุณถูกยกเลิกแล้ว",
         });
-        fetchTransactions();
+        mutate(); // Refresh transactions data
       }
     } catch (error) {
       console.error("Error cancelling transaction:", error);
@@ -260,6 +159,10 @@ export default function TransactionsPage({ userId }) {
     return <Loading />;
   }
 
+  if (error) {
+    return <p className="text-center text-red-500">ไม่สามารถโหลดข้อมูลได้</p>;
+  }
+
   return (
     <div className="min-h-screen w-full flex justify-center p-4">
       <Card className="w-full bg-transparent border border-gray-600">
@@ -269,137 +172,30 @@ export default function TransactionsPage({ userId }) {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>#</TableHead>
-                  <TableHead className="w-[150px]">วันที่และเวลา</TableHead>
-                  <TableHead>ประเภท</TableHead>
-                  <TableHead className="text-center">จำนวนเงิน</TableHead>
-                  <TableHead className="text-center">สถานะ</TableHead>
-                  <TableHead className="">การดำเนินการ</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {transactions.map((transaction, index) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
-                      {format(
-                        new Date(transaction.createdAt),
-                        "dd MMM yyyy HH:mm",
-                        { locale: th }
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {transaction.transactionType === "DEPOSIT" ? (
-                        <span className="flex items-center text-green-600">
-                          <ArrowUpCircle className="mr-2 h-4 w-4" />
-                          ฝากเงิน
-                        </span>
-                      ) : (
-                        <span className="flex items-center text-red-600">
-                          <ArrowDownCircle className="mr-2 h-4 w-4" />
-                          ถอนเงิน
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {formatAmount(
-                        transaction.amount,
-                        transaction.transactionType
-                      )}
-                    </TableCell>
-
-                    <TableCell className="text-center">
-                      <Badge className={getStatusColor(transaction.status)}>
-                        {translateStatus(transaction.status)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {transaction.status.toUpperCase() === "PENDING" && (
-                        <div className="space-x-2 flex">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleOpenModal(transaction)}
-                          >
-                            อัพโหลดสลิป
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedTransaction(transaction);
-                              setIsCancelDialogOpen(true);
-                            }}
-                          >
-                            <X className="mr-2 h-4 w-4" />
-                            ยกเลิก
-                          </Button>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <TransactionList
+              transactions={transactions}
+              onUploadSlip={handleOpenModal}
+              onCancelTransaction={(transaction) => {
+                setSelectedTransaction(transaction);
+                setIsCancelDialogOpen(true);
+              }}
+            />
           </div>
         </CardContent>
       </Card>
 
-      {/* Modal for uploading slip */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>อัพโหลดสลิป</DialogTitle>
-            <DialogDescription>
-              กรุณาอัพโหลดภาพสลิปเพื่อยืนยันการทำรายการ
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <Label>จำนวนเงิน</Label>
-            <p>
-              {selectedTransaction &&
-                formatAmount(
-                  selectedTransaction.amount,
-                  selectedTransaction.transactionType
-                )}
-            </p>
-            <Label>อัพโหลดสลิป</Label>
-            <Input type="file" onChange={handleFileChange} accept="image/*" />
-          </div>
-          <DialogFooter>
-            <Button  onClick={handleSubmitSlip} disabled={!slipFile}>
-              <Upload className="mr-2 h-4 w-4" />
-              อัพโหลด
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <UploadSlipModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onUpload={handleSubmitSlip}
+        selectedTransaction={selectedTransaction}
+      />
 
-      {/* Confirmation dialog for canceling transaction */}
-      <AlertDialog
-        open={isCancelDialogOpen}
-        onOpenChange={setIsCancelDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>ยืนยันการยกเลิก</AlertDialogTitle>
-            <AlertDialogDescription>
-              คุณต้องการยกเลิกรายการนี้หรือไม่?
-              การดำเนินการนี้ไม่สามารถย้อนกลับได้
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>ปิด</AlertDialogCancel>
-            <AlertDialogAction  className="bg-red-500 text-white hover:bg-red-600" onClick={handleCancelTransaction}>
-
-              ยืนยัน
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CancelConfirmationDialog
+        isOpen={isCancelDialogOpen}
+        onClose={() => setIsCancelDialogOpen(false)}
+        onConfirm={handleCancelTransaction}
+      />
     </div>
   );
 }

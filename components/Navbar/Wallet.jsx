@@ -1,56 +1,48 @@
 "use client";
+
 import { Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import useSWR from "swr";
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const WalletComponent = () => {
-  const [walletBalance, setWalletBalance] = useState(null); // สถานะสำหรับเก็บยอดเงินใน Wallet
-  const [loading, setLoading] = useState(true); // สถานะสำหรับแสดงการโหลด
-  const [error, setError] = useState(null); // สถานะสำหรับแสดงข้อผิดพลาด
+  // ใช้ SWR ดึงข้อมูลยอดเงิน
+  const { data, error, isLoading, isValidating } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/wallet`,
+    fetcher,
+    { refreshInterval: 10000 } // อัปเดตข้อมูลทุก 10 วินาที
+  );
 
-  const fetchWallet = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/wallet`
-      );
-      const result = await response.json();
-
-      if (response.ok) {
-        setWalletBalance(result.walletBalance); // บันทึกยอดเงินใน Wallet
-      } else {
-        throw new Error(result.error);
-      }
-    } catch (error) {
-      console.error("Error fetching wallet:", error);
-      setError("ไม่สามารถดึงข้อมูล Wallet ได้"); // แสดงข้อผิดพลาด
-    } finally {
-      setLoading(false); // สิ้นสุดการโหลด
-    }
-  };
-
-  useEffect(() => {
-    fetchWallet();
-  }, []);
-
-  if (loading) {
+  // กรณีโหลดครั้งแรก (Initial Loading)
+  if (isLoading) {
     return (
       <div className="flex items-center gap-2">
-        <Link href="#">
-          <Button
-            variant="outline"
-            className="text-sm font-bold bg-[#2dac5c] text-white rounded-full"
-          >
-            <Wallet size={20} />
-            <span>กำลังโหลด...</span>
-          </Button>
-        </Link>
+        <Button
+          variant="outline"
+          className="text-sm font-bold bg-[#2dac5c] text-white rounded-full animate-pulse"
+        >
+          <Wallet size={20} />
+          <span>กำลังโหลด...</span>
+        </Button>
       </div>
-    ); // ข้อความโหลด
+    );
   }
 
+  // กรณีเกิดข้อผิดพลาด
   if (error) {
-    return <p className="text-red-500">{error}</p>; // ข้อความแสดงข้อผิดพลาด
+    return (
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          className="text-sm font-bold bg-red-600 text-white rounded-full"
+        >
+          <Wallet size={20} />
+          <span>ไม่สามารถโหลดยอดเงินได้</span>
+        </Button>
+      </div>
+    );
   }
 
   return (
@@ -58,10 +50,14 @@ const WalletComponent = () => {
       <Link href="/wallet-top-up">
         <Button
           variant="outline"
-          className="text-sm font-bold bg-[#2dac5c] text-white rounded-full"
+          className={`text-sm font-bold rounded-full ${
+            isValidating
+              ? "bg-[#2dac5c] text-white animate-pulse"
+              : "bg-[#2dac5c] text-white"
+          }`}
         >
           <Wallet size={20} />
-          {walletBalance ? `${walletBalance} BTH` : "ไม่พบข้อมูล"}
+          {data?.walletBalance ? `${data.walletBalance} BTH` : "ไม่พบข้อมูล"}
         </Button>
       </Link>
     </div>

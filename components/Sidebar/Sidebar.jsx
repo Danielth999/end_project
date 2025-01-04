@@ -32,7 +32,7 @@ const navlinks = [
   },
   {
     name: "ภาพศิลปะ",
-    link: "/products",
+    link: "/artworks",
     icon: <LayoutGrid className="w-6 h-6 dark:text-[#20b256]" />, // ใช้ไอคอน Box จาก lucide-react
   },
   {
