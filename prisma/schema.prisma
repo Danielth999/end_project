@@ -20,15 +20,13 @@ model User {
   firstName     String?
   lastName      String?
   walletBalance Decimal       @default(0.00) @db.Decimal(10, 2)
-  role          Role          @default(USER) // ใช้ enum Role
+  role          Role          @default(USER)
   createdAt     DateTime      @default(now()) @db.Timestamp(6)
   imageUrl      String?
   salesCount    Int           @default(0)
   Artworks      Artwork[]
   Bids          Bid[]
-  BlogPosts     Blog[]
   Cart          Cart?
-  Comments      Comment[]
   Orders        Order[]
   Transactions  Transaction[]
   History       History[]
@@ -37,7 +35,7 @@ model User {
 
 model Artwork {
   id                String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId            String? // เปลี่ยนเป็น String
+  userId            String?
   title             String
   description       String?
   categoryId        Int?
@@ -76,24 +74,22 @@ enum ArtworkStatus {
 model Bid {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   artworkId String   @db.Uuid
-  userId    String // เปลี่ยนเป็น String
+  userId    String
   amount    Decimal  @db.Decimal(10, 2)
   isWinning Boolean  @default(false)
   createdAt DateTime @default(now()) @db.Timestamp(6)
 
   Artwork Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
   User    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-
 }
 
 model History {
   id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId      String? // เชื่อมกับผู้ใช้งาน
-  actionType  ActionType // PURCHASE, BID, หรืออื่น ๆ
-  artworkId   String?    @db.Uuid // เชื่อมกับภาพที่เกี่ยวข้อง
-  amount      Decimal?   @db.Decimal(10, 2) // ราคาซื้อ/เสนอราคา
-  downloadUrl String? // ลิงก์สำหรับดาวน์โหลดไฟล์ภาพ (กรณีเป็นการซื้อภาพ)
+  userId      String?
+  actionType  ActionType
+  artworkId   String?    @db.Uuid
+  amount      Decimal?   @db.Decimal(10, 2)
+  downloadUrl String?
   createdAt   DateTime   @default(now()) @db.Timestamp(6)
 
   User    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -101,24 +97,16 @@ model History {
 }
 
 enum ActionType {
-  PURCHASE // ซื้อภาพ
-  BID // การประมูล
+  PURCHASE
+  BID
+  SALE
 }
 
-model Blog {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title       String
-  content     String
-  publishedAt DateTime? @default(now()) @db.Timestamp(6)
-  authorId    String? // เปลี่ยนเป็น String
 
-  User     User?     @relation(fields: [authorId], references: [id], onDelete: Restrict)
-  Comments Comment[]
-}
 
 model Cart {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String?  @unique // เปลี่ยนเป็น String
+  userId    String?  @unique
   createdAt DateTime @default(now()) @db.Timestamp(6)
   updatedAt DateTime @default(now()) @db.Timestamp(6)
 
@@ -136,7 +124,6 @@ model CartItem {
   Cart    Cart?    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   Artwork Artwork? @relation(fields: [artworkId], references: [id], onDelete: Cascade)
 
-  // เพิ่ม unique constraint สำหรับ cartId และ artworkId
   @@unique([cartId, artworkId])
 }
 
@@ -149,21 +136,9 @@ model Category {
   Artworks Artwork[]
 }
 
-model Comment {
-  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  postId          String?  @db.Uuid
-  userId          String? // เปลี่ยนเป็น String
-  content         String
-  createdAt       DateTime @default(now()) @db.Timestamp(6)
-  parentCommentId String?  @db.Uuid
-
-  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Blog Blog? @relation(fields: [postId], references: [id], onDelete: Cascade)
-}
-
 model Order {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId     String? // เปลี่ยนเป็น String
+  userId     String?
   totalPrice Decimal  @db.Decimal(10, 2)
   createdAt  DateTime @default(now()) @db.Timestamp(6)
 
@@ -183,7 +158,7 @@ model OrderItem {
 }
 
 model Profile {
-  id           String   @id // String ID for Clerk
+  id           String   @id
   displayName  String?
   bio          String?
   profileImage String?
@@ -194,11 +169,11 @@ model Profile {
 
 model Transaction {
   id              String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId          String? // เชื่อมกับผู้ใช้งาน
-  transactionType TransactionType? // DEPOSIT หรือ WITHDRAWAL
-  amount          Decimal            @db.Decimal(10, 2) // จำนวนที่ผู้ใช้ได้รับในวอลเลท
+  userId          String?
+  transactionType TransactionType?
+  amount          Decimal            @db.Decimal(10, 2)
   createdAt       DateTime           @default(now()) @db.Timestamp(6)
-  status          TransactionStatus? // PENDING, COMPLETED, FAILED, CANCELLED  
+  status          TransactionStatus?
 
   User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -211,6 +186,6 @@ enum TransactionStatus {
 }
 
 enum TransactionType {
-  DEPOSIT // ฝากเงิน
-  WITHDRAWAL // ถอนเงิน
+  DEPOSIT
+  WITHDRAWAL
 }

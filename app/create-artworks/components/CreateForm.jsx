@@ -13,20 +13,23 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 
 export default function CreateForm({ userId }) {
+  // State สำหรับเก็บข้อมูลฟอร์ม NFT
   const [nftData, setNftData] = useState({
-    title: "",
-    description: "",
-    price: "",
-    image: null,
-    category: "1",
-    tab: "sell",
-    auctionStartPrice: "",
-    auctionStartAt: null,
-    auctionEndAt: null,
+    title: "", // ชื่อ NFT
+    description: "", // คำอธิบาย
+    price: "", // ราคาขาย (ใช้ในกรณีขาย)
+    image: null, // ไฟล์ภาพ
+    category: "1", // หมวดหมู่
+    tab: "sell", // ประเภท (ขายหรือประมูล)
+    auctionStartPrice: "", // ราคาเริ่มต้นการประมูล
+    auctionStartAt: null, // วันที่เริ่มการประมูล
+    auctionEndAt: null, // วันที่สิ้นสุดการประมูล
   });
 
+  // State สำหรับแสดงสถานะการโหลด
   const [isLoading, setIsLoading] = useState(false);
 
+  // ฟังก์ชันจัดการการเปลี่ยนแปลงในฟิลด์อินพุต
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNftData((prevData) => ({
@@ -35,6 +38,7 @@ export default function CreateForm({ userId }) {
     }));
   };
 
+  // ฟังก์ชันจัดการอัปโหลดภาพ
   const handleImageUpload = (e) => {
     const files = e.target.files;
     if (!files) return;
@@ -48,6 +52,7 @@ export default function CreateForm({ userId }) {
     }
   };
 
+  // ฟังก์ชันรีเซ็ตฟอร์ม
   const resetForm = () => {
     setNftData({
       title: "",
@@ -62,6 +67,7 @@ export default function CreateForm({ userId }) {
     });
   };
 
+  // ฟังก์ชันส่งข้อมูลฟอร์ม
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -69,9 +75,9 @@ export default function CreateForm({ userId }) {
     try {
       let imageUrl = null;
 
-      const uploadToast = toast.loading("กำลังอัปโหลดภาพ...");
-
+      // อัปโหลดภาพถ้ามี
       if (nftData.image) {
+        const uploadToast = toast.loading("กำลังอัปโหลดภาพ...");
         const formData = new FormData();
         formData.append("file", nftData.image);
 
@@ -85,12 +91,18 @@ export default function CreateForm({ userId }) {
           }
         );
         imageUrl = uploadResponse.data.url;
-
         toast.success("อัปโหลดภาพสำเร็จ!", { id: uploadToast });
       }
 
-      const createArtworkToast = toast.loading("กำลังสร้าง ผลงาน...");
+      // แปลงวันที่ให้อยู่ในรูปแบบ ISO 8601
+      const auctionStartAt = nftData.auctionStartAt
+        ? new Date(nftData.auctionStartAt).toISOString()
+        : null;
+      const auctionEndAt = nftData.auctionEndAt
+        ? new Date(nftData.auctionEndAt).toISOString()
+        : null;
 
+      // ข้อมูลที่จะส่งไปยัง API
       const artworkData = {
         userId,
         title: nftData.title,
@@ -100,28 +112,27 @@ export default function CreateForm({ userId }) {
           nftData.tab === "auction"
             ? parseFloat(nftData.auctionStartPrice)
             : null,
-        auctionStartAt:
-          nftData.tab === "auction" ? nftData.auctionStartAt : null,
-        auctionEndAt: nftData.tab === "auction" ? nftData.auctionEndAt : null,
+        auctionStartAt, // วันที่เริ่มการประมูล
+        auctionEndAt, // วันที่สิ้นสุดการประมูล
         categoryId: parseInt(nftData.category),
-        typeId: nftData.tab === "sell" ? 1 : 2,
-        imageUrl,
+        typeId: nftData.tab === "sell" ? 1 : 2, // ประเภท (ขายหรือประมูล)
+        imageUrl, // ลิงก์ภาพที่อัปโหลด
       };
 
+      const createArtworkToast = toast.loading("กำลังสร้างผลงาน...");
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/artworks`,
         artworkData
       );
-
       toast.success("สร้าง NFT สำเร็จ!", { id: createArtworkToast });
       console.log("Artwork created:", response.data);
 
-      resetForm();
+      resetForm(); // รีเซ็ตฟอร์มหลังสร้างเสร็จ
     } catch (error) {
       console.error("Error creating artwork:", error);
       toast.error("เกิดข้อผิดพลาดในการสร้าง NFT");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // ปิดสถานะโหลด
     }
   };
 

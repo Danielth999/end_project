@@ -17,7 +17,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useState } from "react"; // เรียก useState ภายในคอมโพเนนต์
 
-const ArtworkCard = ({ artWorks, userId }) => {
+const LatestArtwork = ({ artWorks , userId}) => {
   const [isAdding, setIsAdding] = useState(false); // เรียก useState ภายในคอมโพเนนต์
 
   const createdAtDate = artWorks.createdAt
@@ -73,9 +73,9 @@ const ArtworkCard = ({ artWorks, userId }) => {
             <Image
               src={artWorks.imageUrl}
               alt={artWorks.name}
-              fill
-              sizes="100vw"
-              className=" transition-transform transform group-hover:scale-110"
+              width={400}
+              height={400}
+              className="transition-transform transform group-hover:scale-110"
             />
           </div>
         </CardHeader>
@@ -123,4 +123,4 @@ const ArtworkCard = ({ artWorks, userId }) => {
   );
 };
 
-export default ArtworkCard; // ตรวจสอบว่า export คอมโพเนนต์ถูกต้อง
+export default LatestArtwork; // ตรวจสอบว่า export คอมโพเนนต์ถูกต้อง

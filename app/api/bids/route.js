@@ -96,16 +96,6 @@ export async function POST(request) {
       data: { highestBid: amount },
     });
 
-    // บันทึกการเสนอราคาในประวัติ
-    await prisma.history.create({
-      data: {
-        userId,
-        artworkId,
-        actionType: "BID", // กำหนดประเภทของการกระทำเป็น BID
-        amount,
-      },
-    });
-
     // ส่งข้อความยืนยันว่าการเสนอราคาสำเร็จ
     return NextResponse.json(
       { message: "Bid placed successfully", bid: newBid },

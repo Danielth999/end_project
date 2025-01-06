@@ -153,7 +153,7 @@ export default function Cart({ userId }) {
         </p>
       </div>
       <div className="flex justify-end mt-4">
-        <Link href="/checkout" passHref>
+        <Link href="/order" passHref>
           <Button
             size="lg"
             className="bg-[#2dac5c] hover:bg-[#238c4b] text-white"

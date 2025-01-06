@@ -1,10 +1,9 @@
 import React from "react";
 import Hero from "../Hero/Hero";
-import PopularNFTs from "../Popular/Popular";
+import LatestArtwork from "../LatestArtwork/LatestArtwork";
 import PopularArtists from "../PopularArtists/PopularArtists";
-import Auction from "@/components/Auction/Auction";
-import ForumBlog from "../ForumBlog/ForumBlog";
-
+import AuctionProvider from "@/components/Auction/AuctionProvider";
+import { auth } from "@clerk/nextjs/server";
 async function fetchUsers() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
     next: { revalidate: 60 }, // Revalidate the cache every 60 seconds
@@ -32,17 +31,39 @@ async function fetchArtworkStats() {
   return res.json();
 }
 
+async function fetchLatestArtworks() {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/artworks?limit=4`,
+    {
+      next: { revalidate: 60 }, // Revalidate the cache every 60 seconds
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch latest artworks");
+  }
+
+  return res.json();
+}
+
 const LayoutHome = async () => {
+  const { userId } = await auth();
   const users = await fetchUsers(); // Fetch the user data
   const artworkStats = await fetchArtworkStats(); // Fetch the artwork stats
+  const latestArtworks = await fetchLatestArtworks(); // Fetch the latest artworks
 
   return (
     <>
       <Hero artworkStats={artworkStats} /> {/* Pass artworkStats as props */}
       <PopularArtists users={users} /> {/* Pass users as props */}
-      <PopularNFTs />
-      <Auction />
-      <ForumBlog />
+      {/* loop through latestArtworks and pass each artwork as props  */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {latestArtworks.map((artwork) => (
+          <LatestArtwork key={artwork.id} artWorks={artwork} userId={userId} />
+        ))}
+      </div>
+      {/* Pass latestArtworks as props */}
+      <AuctionProvider />
     </>
   );
 };

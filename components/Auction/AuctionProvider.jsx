@@ -1,6 +1,6 @@
 "use client";
 import useSWR from "swr";
-import Auction from "./components/Auction";
+import Auction from "./Auction";
 import fetcher from "@/lib/fetcher";
 import Loading from "@/components/Loading";
 export default function AuctionsPage() {
@@ -8,17 +8,19 @@ export default function AuctionsPage() {
     data: auctionNFTs,
     error,
     isLoading,
-    mutate,
+    mutate, // For forcing refresh
   } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions`, fetcher, {
-    refreshInterval: 5000,
+    refreshInterval: 5000, // Automatically refresh every 5 seconds
+    revalidateOnMount: true, // บังคับรีเฟรชข้อมูลเมื่อโหลดครั้งแรก
+    revalidateOnFocus: true, // บังคับรีเฟรชข้อมูลเมื่อเปลี่ยนโฟกัส
   });
 
   const handleBidSuccess = async (updatedAuction) => {
-    await mutate((data) =>
-      data.map((auction) =>
-        auction.id === updatedAuction.id ? { ...auction, ...updatedAuction } : auction
-      )
-    );
+    await mutate((data) => {
+      return data.map((auction) =>
+        auction.id === updatedAuction.id ? updatedAuction : auction
+      );
+    }, false);
   };
 
   if (isLoading) return <Loading />;
@@ -28,4 +30,3 @@ export default function AuctionsPage() {
     <Auction initialAuctionNFTs={auctionNFTs} onBidSuccess={handleBidSuccess} />
   );
 }
-

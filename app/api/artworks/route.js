@@ -1,8 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+
+
+export async function GET(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get("limit")) || 10; // Default limit to 10 if not provided
+
     const artworks = await prisma.artwork.findMany({
       where: {
         status: "ACTIVE",
@@ -11,6 +16,7 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
+      take: limit, // Apply the limit
       include: {
         User: true,
         Category: true,

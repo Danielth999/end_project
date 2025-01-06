@@ -9,11 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useUser } from "@clerk/nextjs";
 
 export default function AuctionCard({ nft, onBid, onTimeUp }) {
-  const { user } = useUser();
-
   return (
     <div className="bg-gradient-to-br from-gray-900 to-black rounded-lg overflow-hidden shadow-2xl border border-gray-800 flex flex-col">
       <div className="relative w-full h-64 overflow-hidden">
@@ -41,7 +38,7 @@ export default function AuctionCard({ nft, onBid, onTimeUp }) {
           onTimeUp={onTimeUp}
         />
         <div className="mt-4 space-y-2">
-          <BidDialog nft={nft} onBid={onBid} userId={user.id} />
+          <BidDialog nft={nft} onBid={onBid} />
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline" className="w-full">

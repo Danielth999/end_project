@@ -1,13 +1,46 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { CalendarIcon, Clock } from 'lucide-react';
-import { format } from "date-fns";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 export default function AuctionForm({ nftData, handleInputChange, setNftData }) {
+  // ฟังก์ชันสำหรับอัปเดตระยะเวลา
+  const handleDurationChange = (e) => {
+    const value = parseInt(e.target.value, 10); // แปลงค่าจาก input เป็นตัวเลข
+    if (!isNaN(value)) {
+      const durationUnit = nftData.durationUnit || "hours"; // ตั้งค่า default เป็น "hours"
+      updateAuctionEndAt(value, durationUnit); // อัปเดต auctionEndAt
+      setNftData((prev) => ({
+        ...prev,
+        durationValue: value,
+        durationUnit, // ตั้งค่า durationUnit ถ้ายังไม่มี
+      }));
+    }
+  };
+
+  // ฟังก์ชันสำหรับเปลี่ยนหน่วยเวลา
+  const handleDurationUnitChange = (unit) => {
+    setNftData((prev) => ({
+      ...prev,
+      durationUnit: unit,
+    }));
+
+    if (nftData.durationValue) {
+      updateAuctionEndAt(nftData.durationValue, unit); // อัปเดต auctionEndAt
+    }
+  };
+
+  // ฟังก์ชันคำนวณ auctionEndAt
+  const updateAuctionEndAt = (value, unit) => {
+    const startAt = new Date(nftData.auctionStartAt || Date.now());
+    const durationInMs = unit === "hours" ? value * 60 * 60 * 1000 : value * 60 * 1000;
+    const endAt = new Date(startAt.getTime() + durationInMs);
+    setNftData((prev) => ({
+      ...prev,
+      auctionEndAt: endAt.toISOString(),
+    }));
+  };
+
   return (
     <div className="space-y-6">
       <div className="space-y-2">
@@ -60,78 +93,44 @@ export default function AuctionForm({ nftData, handleInputChange, setNftData }) 
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-lg font-medium text-white">
-                วันที่เริ่มต้น
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal bg-gray-900/50 border-gray-700"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {nftData.auctionStartAt ? (
-                      format(new Date(nftData.auctionStartAt), "PPP")
-                    ) : (
-                      <span>เลือกวันที่เริ่มต้น</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={nftData.auctionStartAt ? new Date(nftData.auctionStartAt) : null}
-                    onSelect={(date) =>
-                      setNftData((prev) => ({
-                        ...prev,
-                        auctionStartAt: date ? date.toISOString() : null,
-                      }))
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-lg font-medium text-white">
-                วันที่สิ้นสุด
-              </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal bg-gray-900/50 border-gray-700"
-                  >
-                    <Clock className="mr-2 h-4 w-4" />
-                    {nftData.auctionEndAt ? (
-                      format(new Date(nftData.auctionEndAt), "PPP")
-                    ) : (
-                      <span>เลือกวันที่สิ้นสุด</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={nftData.auctionEndAt ? new Date(nftData.auctionEndAt) : null}
-                    onSelect={(date) =>
-                      setNftData((prev) => ({
-                        ...prev,
-                        auctionEndAt: date ? date.toISOString() : null,
-                      }))
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+          <div className="space-y-2">
+            <Label htmlFor="duration" className="text-lg font-medium text-white">
+              ระยะเวลา
+            </Label>
+            <div className="flex gap-4">
+              <Input
+                type="number"
+                id="duration"
+                name="duration"
+                className="bg-gray-900/50 border-gray-700 w-2/3"
+                placeholder="ระบุระยะเวลา"
+                value={nftData.durationValue || ""}
+                onChange={handleDurationChange}
+                required
+              />
+              <Select
+                value={nftData.durationUnit || "hours"}
+                onValueChange={handleDurationUnitChange}
+              >
+                <SelectTrigger className="w-full bg-gray-900/50 border-gray-700">
+                  <SelectValue placeholder="หน่วยเวลา" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="minutes">นาที</SelectItem>
+                  <SelectItem value="hours">ชั่วโมง</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
+
+          {nftData.auctionEndAt && (
+            <p className="text-sm text-gray-400">
+              วันสิ้นสุดการประมูล: {new Date(nftData.auctionEndAt).toLocaleString()}
+            </p>
+          )}
         </div>
       </Card>
     </div>
   );
 }
-
+ 

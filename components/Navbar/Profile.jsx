@@ -49,6 +49,9 @@ const Profile = () => {
         <DropdownMenuItem asChild>
           <Link href="/profile">โปรไฟล์</Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/history">ประวัติการสั่งซื้อ/ประมูล</Link>
+        </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link href="/transactions">ประวัติการทำธุรกรรม</Link>

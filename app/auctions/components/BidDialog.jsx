@@ -9,106 +9,95 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useUser } from "@clerk/nextjs";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-export default function BidDialog({ nft, onBid }) {
-  const { user } = useUser();
-  const [bidAmount, setBidAmount] = useState(nft.currentBid + 0.1);
+export default function BidDialog({ nft, onBid, userId }) {
+  const currentBid = Math.floor(nft.currentBid || 0);
+
+  const [bidAmount, setBidAmount] = useState(currentBid + 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isWinning, setIsWinning] = useState(false);
-  const [isCreator, setIsCreator] = useState(false); // เพิ่มสถานะเพื่อตรวจสอบว่าเป็นผู้สร้างหรือไม่
+  const [isCreator, setIsCreator] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  // ตรวจสอบว่าผู้ใช้เป็นผู้สร้างหรือไม่
-  useEffect(() => {
-    const checkCreatorStatus = async () => {
-      try {
-        if (user?.id === nft.userId) {
-          // เปรียบเทียบ user ID กับ creator ID ของ NFT
-          setIsCreator(true);
-        }
-      } catch (error) {
-        console.error("Error checking creator status:", error);
-      }
-    };
+  // ฟังก์ชันสำหรับตรวจสอบสถานะ `isWinning` และ `isCreator`
+  const checkStatus = async () => {
+    try {
+      setIsCreator(userId === nft.userId); // ตรวจสอบว่าผู้ใช้เป็นผู้สร้างหรือไม่
 
-    if (user?.id) {
-      checkCreatorStatus();
-    }
-  }, [user?.id, nft.userId]);
-
-  // ตรวจสอบว่าผู้ใช้ยังเป็นผู้ชนะอยู่หรือไม่
-  useEffect(() => {
-    const checkWinningStatus = async () => {
-      try {
+      if (userId && userId !== nft.userId) {
         const response = await axios.get(
-          `/api/bids/check-winning?artworkId=${nft.id}&userId=${user.id}`
+          `/api/bids/check-winning?artworkId=${nft.id}&userId=${userId}`
         );
-        setIsWinning(response.data.isWinning);
-      } catch (error) {
-        console.error("Error checking winning status:", error);
+        setIsWinning(response.data.isWinning); // ตรวจสอบว่าผู้ใช้เป็นผู้เสนอราคาสูงสุดหรือไม่
       }
-    };
-
-    if (user?.id && !isCreator) {
-      // ตรวจสอบสถานะการชนะเฉพาะเมื่อไม่ใช่ผู้สร้าง
-      checkWinningStatus();
+    } catch (error) {
+      console.error("Error checking status:", error);
     }
-  }, [user?.id, nft.id, isCreator]);
+  };
+
+  // เรียก `checkStatus` ทุกครั้งที่ `currentBid` หรือ `userId` เปลี่ยนแปลง
+  useEffect(() => {
+    checkStatus();
+  }, [currentBid, userId]);
 
   const handleBid = async () => {
+    const parsedBid = parseInt(bidAmount, 10);
+
+    if (isNaN(parsedBid) || parsedBid < currentBid + 1) {
+      toast.error(`ราคาที่เสนอต้องไม่น้อยกว่า ${currentBid + 1}`);
+      return;
+    }
+
     if (isCreator) {
-      // ไม่อนุญาตให้ผู้สร้างการประมูลเสนอราคา
       toast.error("ผู้สร้างการประมูลไม่สามารถเสนอราคาได้");
       return;
     }
 
-    if (isWinning) {
-      toast.error(
-        "คุณยังเป็นผู้เสนอราคาสูงสุดอยู่แล้ว ไม่สามารถเสนอราคาใหม่ได้"
-      );
-      return;
-    }
+    setIsSubmitting(true);
 
-    if (bidAmount > nft.currentBid) {
-      setIsSubmitting(true);
+    const toastId = toast.loading("กำลังเสนอราคา...");
 
-      const toastId = toast.loading("กำลังเสนอราคา...");
-
-      try {
-        const response = await axios.post("/api/bids", {
+    try {
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/bids`,
+        {
           artworkId: nft.id,
-          userId: user.id,
-          amount: bidAmount,
-        });
-
-        if (response.status === 200) {
-          onBid(nft.id, bidAmount); // อัปเดตสถานะใน UI
-          toast.success("เสนอราคาสำเร็จ!", { id: toastId });
+          userId,
+          amount: parsedBid,
         }
-      } catch (error) {
-        console.error("Error placing bid:", error);
-        toast.error(
-          error.response?.data?.message || "เกิดข้อผิดพลาดในการเสนอราคา",
-          { id: toastId }
-        );
-      } finally {
-        setIsSubmitting(false);
+      );
+
+      if (response.status === 200) {
+        onBid(nft.id, parsedBid); // อัปเดตสถานะใน UI
+        toast.success("เสนอราคาสำเร็จ!", { id: toastId });
+        setIsOpen(false); // ปิด Dialog เมื่อเสนอราคาสำเร็จ
+        checkStatus(); // อัปเดตสถานะหลังการประมูลสำเร็จ
       }
-    } else {
-      toast.error("ราคาที่เสนอต้องสูงกว่าปัจจุบัน");
+    } catch (error) {
+      console.error("Error placing bid:", error);
+      toast.error(
+        error.response?.data?.message || "เกิดข้อผิดพลาดในการเสนอราคา",
+        { id: toastId }
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
           className="w-full bg-[#2dac5c] text-white hover:bg-[#249652]"
-          disabled={isCreator} // ปิดปุ่มหากเป็นผู้สร้าง
+          disabled={isCreator || isWinning} // ปิดปุ่มถ้าเป็นผู้สร้างหรือเป็นผู้ชนะ
         >
-          วางราคาเสนอ
+          {isCreator
+            ? "คุณเป็นผู้สร้าง"
+            : isWinning
+            ? "คุณเป็นผู้เสนอราคาสูงสุด"
+            : "วางราคาเสนอ"}
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-gray-900 text-white border border-gray-800">
@@ -116,34 +105,31 @@ export default function BidDialog({ nft, onBid }) {
           <DialogTitle>วางราคาเสนอสำหรับ {nft.name}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col space-y-4">
-          <p>ราคาเสนอปัจจุบัน: {nft.currentBid} BTH</p>
+          <p>ราคาเสนอปัจจุบัน: {currentBid} BTH</p>
           {isCreator ? (
             <p className="text-red-400 text-sm">
               คุณเป็นผู้สร้างการประมูล ไม่สามารถเสนอราคาได้
             </p>
+          ) : isWinning ? (
+            <p className="text-green-400 text-sm">คุณเป็นผู้เสนอราคาสูงสุด</p>
           ) : (
             <>
               <input
                 type="number"
                 value={bidAmount}
-                onChange={(e) => setBidAmount(parseFloat(e.target.value))}
-                step="0.1"
-                min={nft.currentBid + 0.1}
+                onChange={(e) => setBidAmount(e.target.value)}
+                step="1"
+                min={currentBid + 1}
                 className="bg-gray-800 border-gray-700 text-white px-4 py-2 rounded"
               />
               <Button
                 onClick={handleBid}
                 className="bg-[#2dac5c] text-white hover:bg-[#249652]"
-                disabled={isSubmitting || isWinning || isCreator}
+                disabled={isSubmitting || isCreator || isWinning}
               >
                 {isSubmitting ? "กำลังดำเนินการ..." : "ยืนยันราคาเสนอ"}
               </Button>
             </>
-          )}
-          {isWinning && (
-            <p className="text-red-400 text-sm">
-              คุณยังเป็นผู้เสนอราคาสูงสุดอยู่แล้ว ไม่สามารถเสนอราคาใหม่ได้
-            </p>
           )}
         </div>
       </DialogContent>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -8,10 +9,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import AuctionCard from "./AuctionCard";
-import { useState, useEffect } from "react";
+
 export default function Auction({ initialAuctionNFTs, onBidSuccess }) {
   const [auctionNFTs, setAuctionNFTs] = useState(initialAuctionNFTs);
   const [sortOrder, setSortOrder] = useState("endingSoon");
+
   useEffect(() => {
     setAuctionNFTs(initialAuctionNFTs);
   }, [initialAuctionNFTs]);
@@ -22,8 +24,13 @@ export default function Auction({ initialAuctionNFTs, onBidSuccess }) {
         nft.id === id ? { ...nft, currentBid: amount } : nft
       )
     );
-    onBidSuccess({ id, currentBid: amount }); // ส่งข้อมูลใหม่ไปยัง SWR
+    onBidSuccess({ id, currentBid: amount });
   };
+
+  const handleTimeUp = (id) => {
+    setAuctionNFTs((prevNFTs) => prevNFTs.filter((nft) => nft.id !== id));
+  };
+
   const sortedNFTs = [...auctionNFTs].sort((a, b) => {
     switch (sortOrder) {
       case "endingSoon":
@@ -57,7 +64,12 @@ export default function Auction({ initialAuctionNFTs, onBidSuccess }) {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
           {sortedNFTs.map((nft) => (
-            <AuctionCard key={nft.id} nft={nft} onBid={handleBid} />
+            <AuctionCard
+              key={nft.id}
+              nft={nft}
+              onBid={handleBid}
+              onTimeUp={() => handleTimeUp(nft.id)}
+            />
           ))}
         </div>
       </div>

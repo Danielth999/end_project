@@ -40,18 +40,9 @@ const navlinks = [
     link: "/auctions",
     icon: <Gavel className="w-6 h-6 dark:text-[#20b256]" />, // ใช้ไอคอน Box จาก lucide-react
   },
+
   {
-    name: "พูดคุย",
-    link: "/forum",
-    icon: <MessageCircle className="w-6 h-6 dark:text-[#20b256]" />, // ใช้ไอคอน MessageCircle จาก lucide-react
-  },
-  {
-    name: "ข่าวสาร",
-    link: "/blog",
-    icon: <Newspaper className="w-6 h-6 dark:text-[#20b256]" />, // ใช้ไอคอน Book จาก lucide-react
-  },
-  {
-    name: "สร้าง NFTs",
+    name: "สร้างผลงาน",
     link: "/create-artworks",
     icon: <Plus className="w-6 h-6 dark:text-[#20b256]" />, // ใช้ไอคอน Book จาก lucide-react
   },
@@ -63,7 +54,7 @@ const Sidebar = () => {
   const { isSignedIn } = useUser(); // Check if user is signed in
 
   return (
-    <div className="flex justify-between items-center flex-col sticky top-5 h-[93vh]">
+    <div className="flex justify-between items-center  flex-col sticky top-5 h-[93vh]">
       {/* Logo Section - Links to homepage */}
       <Link href="/">
         <div className="border-2 border-green-500 rounded-[50px] flex justify-center items-center">
@@ -78,7 +69,7 @@ const Sidebar = () => {
       </Link>
 
       {/* Main Sidebar Container */}
-      <div className="flex-1 flex flex-col justify-between items-center dark:bg-gray-900 bg-[#dbe4e9] rounded-[50px] w-[76px] py-4 mt-12">
+      <div className="flex-1 flex flex-col justify-center items-center dark:bg-gray-900 bg-[#dbe4e9] rounded-[50px] w-[76px] py-4 mt-12">
         {/* Navigation Links Section */}
         <div className="flex flex-col justify-center items-center gap-3">
           {/* Map through navigation links */}
