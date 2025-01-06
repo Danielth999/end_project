@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import Profile from "./Profile";
 import WalletComponent from "./Wallet";
-import { Cart } from "./Cart";
+import Cart from "./Cart";
 import Link from "next/link";
 
 const navlinks = [
@@ -57,7 +57,7 @@ const navlinks = [
   },
 ];
 
-const Navbar = () => {
+const Navbar = ({ userId }) => {
   const { isSignedIn } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -135,7 +135,7 @@ const Navbar = () => {
             {isSignedIn && (
               <div className="flex items-center gap-4">
                 <WalletComponent />
-                <Cart />
+                <Cart userId={userId} />
               </div>
             )}
           </div>
@@ -147,7 +147,7 @@ const Navbar = () => {
         {isSignedIn && (
           <>
             <WalletComponent />
-            <Cart />
+            <Cart userId={userId} />
           </>
         )}
         <Profile />

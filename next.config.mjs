@@ -4,43 +4,48 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "img.clerk.com", // Allow loading images from img.clerk.com
-        pathname: "/**", // Allow all paths of img.clerk.com
+        hostname: "img.clerk.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "plus.unsplash.com", // Allow loading images from plus.unsplash.com
-        pathname: "/**", // Allow all paths of plus.unsplash.com
+        hostname: "plus.unsplash.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "images.unsplash.com", // Allow loading images from images.unsplash.com
-        pathname: "/**", // Allow all paths of images.unsplash.com
+        hostname: "images.unsplash.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "source.unsplash.com", // Add source.unsplash.com here
-        pathname: "/**", // Allow all paths of source.unsplash.com
+        hostname: "source.unsplash.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "via.placeholder.com", // Allow loading images from via.placeholder.com
-        pathname: "/**", // Allow all paths of via.placeholder.com
+        hostname: "via.placeholder.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "platform-lookaside.fbsbx.com", // Allow loading images from Facebook
-        pathname: "/**", // Allow all paths of platform-lookaside.fbsbx.com
+        hostname: "platform-lookaside.fbsbx.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "lh3.googleusercontent.com", // Allow loading images from Google Photos
-        pathname: "/**", // Allow all paths
+        hostname: "lh3.googleusercontent.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "images.pexels.com", // Allow loading images from Pexels
-        pathname: "/**", // Allow all paths of images.pexels.com
+        hostname: "images.pexels.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "qtwseyjmrxlktgaecvbh.supabase.co", // Add Supabase hostname
+        pathname: "/**", // Allow all paths under Supabase hostname
       },
     ],
   },

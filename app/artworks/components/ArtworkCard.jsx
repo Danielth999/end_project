@@ -1,3 +1,4 @@
+"use client"; // ตรวจสอบว่ามี "use client" ที่ด้านบน
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 import {
@@ -11,21 +12,61 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
-import { th } from "date-fns/locale"; // ใช้ภาษาไทย
+import { th } from "date-fns/locale";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useState } from "react"; // เรียก useState ภายในคอมโพเนนต์
 
-const ProductsCard = ({ artWorks }) => {
-  // แปลงเวลาให้เป็น "x นาทีผ่านมา"
-  const createdAtDate = artWorks.createdAt ? new Date(artWorks.createdAt) : null;
+const ProductsCard = ({ artWorks, userId }) => {
+  const [isAdding, setIsAdding] = useState(false); // เรียก useState ภายในคอมโพเนนต์
+
+  const createdAtDate = artWorks.createdAt
+    ? new Date(artWorks.createdAt)
+    : null;
   const formattedDate =
     createdAtDate && !isNaN(createdAtDate)
       ? formatDistanceToNow(createdAtDate, { addSuffix: true, locale: th })
       : "ไม่ทราบเวลา";
 
+  const handleAddToCart = async () => {
+    setIsAdding(true); // เริ่ม loading
+    try {
+      // Optimistic UI: แสดงผลทันทีโดยไม่รอ response
+      toast.loading("กำลังเพิ่มสินค้าลงในตะกร้า...", {
+        position: "top-center",
+        duration: 1000,
+      });
+
+      const response = await axios.post("/api/cart", {
+        userId,
+        artworkId: artWorks.id,
+        quantity: 1,
+      });
+
+      if (response.status === 200) {
+        // ปิด loading และแสดงผลสำเร็จ
+        toast.success(`${artWorks.title} ถูกเพิ่มลงในตระกร้าเรียบร้อยแล้ว`, {
+          position: "top-center",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      // แสดงข้อผิดพลาดและย้อนกลับการเปลี่ยนแปลง
+      toast.error(error.response?.data?.error || "ไม่สามารถเพิ่มสินค้าได้", {
+        position: "top-center",
+        duration: 3000,
+      });
+    } finally {
+      setIsAdding(false); // หยุด loading
+    }
+  };
+
   return (
     <div className="transform transition-transform duration-300 hover:-translate-y-1">
       <Card className="relative group overflow-hidden bg-gray-900 text-white border-gray-800">
         <CardHeader className="p-0 relative">
-          <div className="relative w-full h-64 overflow-hidden">
+          <div className="relative w-full h-64 overflow-hidden ">
             <Image
               src={artWorks.imageUrl}
               alt={artWorks.name}
@@ -52,7 +93,7 @@ const ProductsCard = ({ artWorks }) => {
           </div>
         </CardContent>
 
-        <CardFooter className="p-4 flex justify-between items-center ">
+        <CardFooter className="p-4 flex justify-between items-center">
           <Link href={`/artworks/${artWorks.id}`} passHref>
             <Button
               variant="default"
@@ -63,9 +104,15 @@ const ProductsCard = ({ artWorks }) => {
           </Link>
           <Button
             variant="outline"
+            onClick={handleAddToCart}
+            disabled={isAdding} // ปุ่มไม่สามารถกดได้ขณะ loading
             className="bg-transparent border-[#2dac5c] text-[#2dac5c] hover:bg-[#2dac5c] hover:text-white"
           >
-            <ShoppingCart className="h-5 w-5" />
+            {isAdding ? (
+              <div className="animate-spin h-5 w-5 border-2 border-[#2dac5c] border-t-transparent rounded-full"></div>
+            ) : (
+              <ShoppingCart className="h-5 w-5" />
+            )}
           </Button>
         </CardFooter>
       </Card>
@@ -73,4 +120,4 @@ const ProductsCard = ({ artWorks }) => {
   );
 };
 
-export default ProductsCard;
+export default ProductsCard; // ตรวจสอบว่า export คอมโพเนนต์ถูกต้อง

@@ -7,7 +7,7 @@ export async function GET(req, { params }) {
       where: { id: id },
       include: { Category: true, User: true, ArtworkType: true },
     });
-                                    
+
     if (!artworks) {
       return Response.json({ error: "Product not found" }, { status: 404 });
     }

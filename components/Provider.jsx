@@ -11,7 +11,7 @@ const Providers = ({ children }) => {
         disableTransitionOnChange
       >
         {children}
-        <Toaster />
+        <Toaster  position="top-center"/>
       </ThemeProvider>
     </>
   );

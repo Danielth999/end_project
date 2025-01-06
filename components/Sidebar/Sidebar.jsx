@@ -52,7 +52,7 @@ const navlinks = [
   },
   {
     name: "สร้าง NFTs",
-    link: "/create-nfts",
+    link: "/create-artworks",
     icon: <Plus className="w-6 h-6 dark:text-[#20b256]" />, // ใช้ไอคอน Book จาก lucide-react
   },
 ];

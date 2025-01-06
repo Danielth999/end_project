@@ -1,4 +1,4 @@
-import ProductsContainer from "./components/ArtworkContainer.jsx";
+import ProductsContainer from "./components/Artworks.jsx";
 
 
 

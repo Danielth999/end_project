@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { createClerkClient } from '@clerk/backend';
+
+const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
 
 export async function GET(req) {
   try {
@@ -18,6 +23,23 @@ export async function GET(req) {
       );
     }
 
+    // Check role from Clerk's publicMetadata
+    let userRole = user.publicMetadata?.role;
+
+    // If no role is set, default to 'USER'
+    if (!userRole) {
+      userRole = 'USER';
+
+      // Update user's publicMetadata in Clerk
+      await clerk.users.updateUser(user.id, {
+        publicMetadata: {
+          ...user.publicMetadata,
+          role: userRole,
+        },
+      });
+    }
+
+    // Sync user data with Prisma
     let dbUser = await prisma.User.findUnique({
       where: { id: user.id },
     });
@@ -30,7 +52,7 @@ export async function GET(req) {
           lastName: user.lastName ?? "",
           email: user.emailAddresses[0]?.emailAddress ?? "",
           imageUrl: user.imageUrl ?? "",
-          roleId: 1,
+          role: userRole,
         },
       });
     } else {
@@ -41,6 +63,7 @@ export async function GET(req) {
           lastName: user.lastName ?? "",
           email: user.emailAddresses[0]?.emailAddress ?? "",
           imageUrl: user.imageUrl ?? "",
+          role: userRole,
         },
       });
     }

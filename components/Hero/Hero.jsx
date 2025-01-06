@@ -13,7 +13,7 @@ const artTerms = [
   "ดิจิทัลคอลเลกชัน",
 ];
 
-export default function Hero() {
+export default function Hero({ artworkStats }) {
   const [displayText, setDisplayText] = useState("");
   const [currentTermIndex, setCurrentTermIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -82,14 +82,15 @@ export default function Hero() {
                 variant="outline"
                 className="border-gray-700 bg-transparent text-white hover:bg-gray-800"
               >
-                <Link href={"/create-nfts"}>สร้างผลงาน</Link>
+                <Link href={"/create-artworks"}>สร้างผลงาน</Link>
               </Button>
             </div>
             <div className="flex gap-12 pt-4">
               {[
-                { label: "งานศิลปะ", value: "27k+" },
-                { label: "การประมูล", value: "22k+" },
-                { label: "ศิลปิน", value: "12k+" },
+                { label: "งานศิลปะ", value: `${artworkStats.totalArtworks}+` },
+                { label: "การประมูล", value: `${artworkStats.auctionCount}+` },
+                { label: "ศิลปิน", value: `${artworkStats.uniqueUserCount}+` },
+                { label: "ราคาต่ำสุด", value: `${artworkStats.minPrice} BTH` }, // เพิ่มส่วนนี้
               ].map((stat, index) => (
                 <div key={index}>
                   <p className="text-3xl font-bold text-white">{stat.value}</p>
@@ -152,4 +153,3 @@ export default function Hero() {
     </div>
   );
 }
-

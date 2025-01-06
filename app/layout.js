@@ -1,7 +1,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import Provider from "@/components/Provider";
-import Navbar from "@/components/Navbar/Navbar";
+import NavMain from "@/components/Navbar/NavMain";
 import Sidebar from "@/components/Sidebar/Sidebar";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Suspense } from "react";
@@ -43,7 +43,7 @@ export default function RootLayout({ children }) {
               {/* เนื้อหาหลัก */}
               <div className="flex-1 mx-auto w-full max-w-[1400px]">
                 {/* Navbar */}
-                <Navbar />
+                <NavMain />
                 {/* ส่วนของเนื้อหาหลัก */}
                 <main className="mt-4 sm:mt-6 ">
                   <Suspense fallback={<Loading />}>{children}</Suspense>

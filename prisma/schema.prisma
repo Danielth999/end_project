@@ -8,16 +8,22 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+  ARTIST
+}
+
 model User {
   id            String        @id @unique
   email         String        @unique
-  firstName     String? // ตรวจสอบว่ามีฟิลด์นี้
-  lastName      String? // ตรวจสอบว่ามีฟิลด์นี้
+  firstName     String?
+  lastName      String?
   walletBalance Decimal       @default(0.00) @db.Decimal(10, 2)
-  roleId        Int?
+  role          Role          @default(USER) // ใช้ enum Role
   createdAt     DateTime      @default(now()) @db.Timestamp(6)
   imageUrl      String?
-  salesCount    Int           @default(0) // New field for tracking sales count
+  salesCount    Int           @default(0)
   Artworks      Artwork[]
   Bids          Bid[]
   BlogPosts     Blog[]
@@ -27,14 +33,6 @@ model User {
   Transactions  Transaction[]
   History       History[]
   Profile       Profile?
-  Role          Role?         @relation(fields: [roleId], references: [id], onUpdate: Restrict, onDelete: Restrict)
-}
-
-model Role {
-  id          Int     @id @default(autoincrement())
-  name        String  @unique
-  description String?
-  Users       User[]
 }
 
 model Artwork {
@@ -62,11 +60,17 @@ model Artwork {
   History     History[]
 }
 
+model ArtworkType {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  Artworks    Artwork[]
+}
+
 enum ArtworkStatus {
   ACTIVE
   AUCTION_ENDED
   SOLD
-  ARCHIVED
 }
 
 model Bid {
@@ -80,7 +84,7 @@ model Bid {
   Artwork Artwork @relation(fields: [artworkId], references: [id], onDelete: Cascade)
   User    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([artworkId, isWinning])
+
 }
 
 model History {
@@ -131,6 +135,9 @@ model CartItem {
 
   Cart    Cart?    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   Artwork Artwork? @relation(fields: [artworkId], references: [id], onDelete: Cascade)
+
+  // เพิ่ม unique constraint สำหรับ cartId และ artworkId
+  @@unique([cartId, artworkId])
 }
 
 model Category {
@@ -206,11 +213,4 @@ enum TransactionStatus {
 enum TransactionType {
   DEPOSIT // ฝากเงิน
   WITHDRAWAL // ถอนเงิน
-}
-
-model ArtworkType {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  description String?
-  Artworks    Artwork[]
 }

@@ -1,71 +1,55 @@
-// import { getAuth } from "@clerk/nextjs/server";
-// import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
-// export async function POST(req) {
-//   try {
-//     const { userId } = getAuth(req);
+export async function POST(request) {
+  try {
+    const { userId, artworkId, quantity } = await request.json();
 
-//     if (!userId) {
-//       return Response.json({ message: "Unauthorized" }, { status: 401 });
-//     }
+    // Ensure required fields are provided
+    if (!userId || !artworkId || quantity == null) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
 
-//     // ดึงข้อมูลจาก body ของคำขอ
+    // Find or create the user's cart
+    let userCart = await prisma.cart.findUnique({
+      where: { userId },
+    });
 
-//     const { artworkId, quantity } = req.json();
+    if (!userCart) {
+      userCart = await prisma.cart.create({
+        data: { userId },
+      });
+    }
 
-//     if (!artworkId || !quantity || quantity <= 0) {
-//       return Response.json(
-//         { message: "Invalid input. Provide artworkId and quantity > 0." },
-//         { status: 400 }
-//       );
-//     }
+    // Upsert the cart item
+    await prisma.cartItem.upsert({
+      where: {
+        cartId_artworkId: {
+          cartId: userCart.id,
+          artworkId,
+        },
+      },
+      update: {
+        quantity: {
+          increment: quantity,
+        },
+      },
+      create: {
+        cartId: userCart.id,
+        artworkId,
+        quantity,
+      },
+    });
 
-//     // ค้นหาตะกร้าของผู้ใช้
-//     let cart = await prisma.cart.findUnique({
-//       where: { user_id: userId },
-//     });
-
-//     if (!cart) {
-//       cart = await prisma.cart.create({
-//         data: {
-//           user_id: userId,
-//         },
-//       });
-//     }
-
-//     const existingItem = await prisma.cart_items.findFirst({
-//       where: {
-//         cart_id: cart.id,
-//         artwork_id: artworkId,
-//       },
-//     });
-
-//     if (existingItem) {
-//       await prisma.cart_items.update({
-//         where: { id: existingItem.id },
-//         data: {
-//           quantity: existingItem.quantity + quantity,
-//         },
-//       });
-//     } else {
-//       await prisma.cart_items.create({
-//         data: {
-//           cart_id: cart.id,
-//           artwork_id: artworkId,
-//           quantity,
-//         },
-//       });
-//     }
-
-//     return Response.json(
-//       { message: "Item added to cart successfully" },
-//       { status: 200 }
-//     );
-//   } catch (error) {
-//     console.error("Error adding to cart:", error);
-//     return Response.json(
-//       { message: "Failed to add item to cart", error: error.message },
-//       { status: 500 }
-//     );
-//   }
-// }
+    return NextResponse.json({ message: "Item added to cart successfully." });
+  } catch (error) {
+    console.error("Error adding item to cart:", error);
+    return NextResponse.json(
+      { error: "Failed to add item to cart." },
+      { status: 500 }
+    );
+  }
+}

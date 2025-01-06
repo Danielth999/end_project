@@ -17,12 +17,28 @@ async function fetchUsers() {
   return res.json();
 }
 
+async function fetchArtworkStats() {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/artworkStats`,
+    {
+      next: { revalidate: 60 }, // Revalidate the cache every 60 seconds
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch artwork stats");
+  }
+
+  return res.json();
+}
+
 const LayoutHome = async () => {
   const users = await fetchUsers(); // Fetch the user data
+  const artworkStats = await fetchArtworkStats(); // Fetch the artwork stats
 
   return (
     <>
-      <Hero />
+      <Hero artworkStats={artworkStats} /> {/* Pass artworkStats as props */}
       <PopularArtists users={users} /> {/* Pass users as props */}
       <PopularNFTs />
       <Auction />

@@ -178,8 +178,8 @@ const ProductDetailPage = ({ artWorks }) => {
                   <div>
                     <p className="text-sm text-gray-400">ผู้สร้าง</p>
                     <Link
-                      href={`/profile/${artWorks.User.id}`}
-                      className="font-semibold hover:underline text-green-500"
+                      href={`/profile/${artWorks.userId}`}
+                      className="font-semibold hover:underline hover:text-green-500"
                     >
                       {artWorks.User?.firstName}
                       <span> </span>

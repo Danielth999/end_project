@@ -1,14 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-/**
- * GET /api/artwork-stats/:id
- * Fetches artwork statistics for a specific user.
- *
- * @param {Request} req - Incoming HTTP request object
- * @param {Object} params - Parameters object containing `id`
- * @returns {NextResponse} - JSON response with artwork stats or an error message
- */
 export async function GET(req, { params }) {
   const { id: userId } = params; // Extract user ID from route parameters
 
