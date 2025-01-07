@@ -29,7 +29,7 @@ export default function OrderContainer({ userId }) {
   const processOrder = async () => {
     setIsProcessing(true);
     try {
-      const response = await fetch("/api/order", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,10 +77,10 @@ export default function OrderContainer({ userId }) {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gray-800 rounded-lg shadow-lg">
-      <div className="mb-8">
-        <ol className="flex items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base">
+      <div className="mb-8" >
+        <ol className="flex  items-center w-full text-sm font-medium text-center text-gray-500 dark:text-gray-400 sm:text-base">
           {steps.map((step, index) => (
-            <li key={step.id} className={`flex md:w-full items-center ${currentStep === step.id ? 'text-blue-600 dark:text-blue-500' : 'text-gray-500 dark:text-gray-400'} sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700`}>
+            <li key={step.id} className={`flex md:w-full items-center ${currentStep === step.id ? 'text-green-600 dark:text-green-500' : 'text-gray-500 dark:text-gray-400'} sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-6 xl:after:mx-10 dark:after:border-gray-700`}>
               <span className="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200 dark:after:text-gray-500">
                 {step.icon && <step.icon className="w-4 h-4 mr-2" />}
                 {step.label}

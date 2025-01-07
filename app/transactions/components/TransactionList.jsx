@@ -18,6 +18,7 @@ export default function TransactionList({
   onCancelTransaction,
 }) {
   console.log("transactions", transactions);
+
   const formatAmount = (amount, type) => {
     const formattedAmount = new Intl.NumberFormat("th-TH", {
       style: "currency",
@@ -101,13 +102,17 @@ export default function TransactionList({
             <TableCell className="text-center">
               {transaction.status.toUpperCase() === "PENDING" && (
                 <div className="space-x-2 flex">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onUploadSlip(transaction)}
-                  >
-                    อัพโหลดสลิป
-                  </Button>
+                  {/* แสดงปุ่มอัพโหลดสลิปเฉพาะสำหรับการฝากเงิน */}
+                  {transaction.transactionType === "DEPOSIT" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onUploadSlip(transaction)}
+                    >
+                      อัพโหลดสลิป
+                    </Button>
+                  )}
+                  {/* แสดงปุ่มยกเลิกสำหรับทั้งการฝากและถอนเงิน */}
                   <Button
                     variant="destructive"
                     size="sm"

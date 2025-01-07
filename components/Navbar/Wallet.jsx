@@ -45,9 +45,9 @@ const WalletComponent = () => {
     );
   }
 
-  return (
+  return (  
     <div className="flex items-center gap-2">
-      <Link href="/wallet-top-up">
+      <Link href="/wallet">
         <Button
           variant="outline"
           className={`text-sm font-bold rounded-full ${

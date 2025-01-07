@@ -2,7 +2,7 @@
 
 import SignIn from "./SignIn";
 import { SignOutButton } from "@clerk/nextjs";
-
+import { useUserRole } from "@/hooks/useUserRole";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -13,13 +13,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 
 const Profile = () => {
-  const { user } = useUser();
+  const { userRole, user, isLoading } = useUserRole();
 
-  if (!user) {
+  // แสดงหน้า SignIn หากยังไม่มี user หรือกำลังโหลด
+  if (isLoading || !user) {
     return <SignIn />;
   }
 
@@ -52,10 +52,16 @@ const Profile = () => {
         <DropdownMenuItem asChild>
           <Link href="/history">ประวัติการสั่งซื้อ/ประมูล</Link>
         </DropdownMenuItem>
-
         <DropdownMenuItem asChild>
           <Link href="/transactions">ประวัติการทำธุรกรรม</Link>
         </DropdownMenuItem>
+
+        {/* แสดงเมนู admin เฉพาะผู้ใช้ที่มี role เป็น ADMIN */}
+        {userRole === "ADMIN" && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin">ระบบแอดมิน</Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <SignOutButton>ออกจากระบบ</SignOutButton>

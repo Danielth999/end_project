@@ -17,7 +17,12 @@ import fetcher from "@/lib/fetcher";
 import { useState } from "react";
 
 export default function Transactions({ userId }) {
-  const { data: transactions, error, isLoading, mutate } = useSWR(
+  const {
+    data: transactions,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${userId}`,
     fetcher
   );
@@ -41,7 +46,7 @@ export default function Transactions({ userId }) {
 
     const formData = new FormData();
     formData.append("files", slipFile);
-    formData.append("log", true); //ตรวจสอบสลิปซ้ำ
+    formData.append("log", true); // ตรวจสอบสลิปซ้ำ
 
     try {
       Swal.fire({
@@ -53,7 +58,7 @@ export default function Transactions({ userId }) {
         },
       });
 
-      const response = await fetch(process.env.NEXT_PUBLIC_SLIP_OK_API_URL, {
+      const response = await fetch("https://api.slipok.com/api/line/apikey/33341", {
         method: "POST",
         headers: {
           "x-authorization": `SLIPOKC963LWT`,
@@ -79,14 +84,11 @@ export default function Transactions({ userId }) {
           return;
         }
 
-        await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/${userId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount: slipAmount }),
-          }
-        );
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/wallet/${userId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: slipAmount }),
+        });
 
         await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${selectedTransaction.id}`,

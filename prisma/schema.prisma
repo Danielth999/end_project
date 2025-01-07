@@ -31,6 +31,22 @@ model User {
   Transactions  Transaction[]
   History       History[]
   Profile       Profile?
+  BankAccount   BankAccount[]
+}
+
+model BankAccount {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String
+  bankName      String // ชื่อธนาคาร
+  accountNumber String // เลขบัญชี
+  accountName   String // ชื่อเจ้าของบัญชี
+  createdAt     DateTime @default(now()) @db.Timestamp(6)
+  updatedAt     DateTime @default(now()) @db.Timestamp(6)
+
+  User         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@unique([userId, accountNumber]) // หนึ่งผู้ใช้สามารถมีบัญชีธนาคารได้หลายบัญชี แต่เลขบัญชีต้องไม่ซ้ำ
 }
 
 model Artwork {
@@ -102,8 +118,6 @@ enum ActionType {
   SALE
 }
 
-
-
 model Cart {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String?  @unique
@@ -174,8 +188,10 @@ model Transaction {
   amount          Decimal            @db.Decimal(10, 2)
   createdAt       DateTime           @default(now()) @db.Timestamp(6)
   status          TransactionStatus?
+  bankAccountId   String?            @db.Uuid
 
-  User User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User        User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  BankAccount BankAccount? @relation(fields: [bankAccountId], references: [id], onDelete: Cascade)
 }
 
 enum TransactionStatus {

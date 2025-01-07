@@ -23,7 +23,7 @@ export default function Cart({ userId }) {
     <Button
       asChild
       variant="outline"
-      className="relative p-2 text-sm font-bold bg-[#2dac5c] hover:bg-[#238c4b] rounded-full transition-colors duration-300 shadow-lg"
+      className="relative py-2 px-4 text-sm font-bold bg-[#2dac5c] hover:bg-[#238c4b] rounded-full transition-colors duration-300 shadow-lg"
     >
       <Link href="/cart" className="flex items-center justify-center">
         <ShoppingCart className="h-6 w-6 text-white" />

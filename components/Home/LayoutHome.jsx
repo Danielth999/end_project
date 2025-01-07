@@ -2,7 +2,6 @@ import React from "react";
 import Hero from "../Hero/Hero";
 import LatestArtwork from "../LatestArtwork/LatestArtwork";
 import PopularArtists from "../PopularArtists/PopularArtists";
-import AuctionProvider from "@/components/Auction/AuctionProvider";
 import { auth } from "@clerk/nextjs/server";
 async function fetchUsers() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
@@ -63,7 +62,6 @@ const LayoutHome = async () => {
         ))}
       </div>
       {/* Pass latestArtworks as props */}
-      <AuctionProvider />
     </>
   );
 };
