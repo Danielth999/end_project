@@ -160,7 +160,7 @@ const ProductDetailPage = ({ artWorks }) => {
                 </Popover>
               </div>
             </div>
-            <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-8">
+            {/* <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-8">
               <Button className="flex-grow bg-green-500 hover:bg-green-600 transition-all duration-300">
                 ซื้อเลย
               </Button>
@@ -171,7 +171,7 @@ const ProductDetailPage = ({ artWorks }) => {
                 <ShoppingCart className="h-5 w-5 mr-2" />
                 เพิ่มลงตะกร้า
               </Button>
-            </div>
+            </div> */}
             <Card className="bg-gray-800 border-gray-700 overflow-hidden">
               <CardContent className="p-4">
                 <div className="grid grid-cols-2 gap-4 text-sm md:text-base">
