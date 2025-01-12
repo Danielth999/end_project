@@ -58,7 +58,7 @@ export default function Transactions({ userId }) {
         },
       });
 
-      const response = await fetch("https://api.slipok.com/api/line/apikey/33341", {
+      const response = await fetch(NEXT_PUBLIC_SLIP_OK_API_URL, {
         method: "POST",
         headers: {
           "x-authorization": `SLIPOKC963LWT`,
