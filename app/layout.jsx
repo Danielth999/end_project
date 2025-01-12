@@ -77,6 +77,12 @@ export default function RootLayout({ children }) {
         lang="en"
         suppressHydrationWarning
       >
+        <head>
+          <meta
+            name="google-site-verification"
+            content="lgf74pzOKh0EhgWQ6MQl0cgd8mfs4uN66G0mizGbO6A"
+          />
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-gray-900 via-gray-800`}
         >
