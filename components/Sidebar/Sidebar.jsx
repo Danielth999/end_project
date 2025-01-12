@@ -57,13 +57,13 @@ const Sidebar = () => {
     <div className="flex justify-between items-center  flex-col sticky top-5 h-[93vh]">
       {/* Logo Section - Links to homepage */}
       <Link href="/">
-        <div className="border-2 border-green-500 rounded-[50px] flex justify-center items-center">
+        <div className="rounded-full ">
           <Image
             src={Logo}
             alt="logo"
             width={52} // ตั้งขนาดโลโก้ให้เหมาะสม
             height={52}
-            className="object-cover rounded-full" // ให้ภาพไม่ผิดสัดส่วน
+            className="object-cover " // ให้ภาพไม่ผิดสัดส่วน
           />
         </div>
       </Link>

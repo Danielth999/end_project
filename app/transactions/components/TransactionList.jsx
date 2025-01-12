@@ -17,7 +17,7 @@ export default function TransactionList({
   onUploadSlip,
   onCancelTransaction,
 }) {
-  console.log("transactions", transactions);
+
 
   const formatAmount = (amount, type) => {
     const formattedAmount = new Intl.NumberFormat("th-TH", {

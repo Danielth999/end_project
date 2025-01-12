@@ -186,6 +186,7 @@ const ArtworkCard = ({ artWorks, userId }) => {
               alt={artWorks.title}
               fill
               sizes="100vw"
+              loading="lazy"
               className="transition-transform duration-300"
             />
           </motion.div>

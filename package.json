@@ -7,9 +7,7 @@
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate",
-    "m": "prisma migrate dev --name init",
-    "g": "prisma generate"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.9.6",
@@ -46,9 +44,6 @@
     "react-hot-toast": "^2.5.1",
     "recharts": "^2.15.0",
     "sharp": "^0.33.5",
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1",
-    "stripe": "^17.5.0",
     "sweetalert2": "^11.6.13",
     "swiper": "^11.1.15",
     "swr": "^2.3.0",

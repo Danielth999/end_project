@@ -13,7 +13,7 @@
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: sans-serif,Arial, Helvetica, ;
 }
 ::-webkit-scrollbar {
   width: 0;

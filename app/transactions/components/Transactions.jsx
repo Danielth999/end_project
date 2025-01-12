@@ -13,7 +13,7 @@ import {
 import TransactionList from "./TransactionList";
 import UploadSlipModal from "./UploadSlipModal";
 import CancelConfirmationDialog from "./CancelConfirmationDialog";
-import fetcher from "@/lib/fetcher";
+import axios from "axios"; // นำเข้า axios
 import { useState } from "react";
 
 export default function Transactions({ userId }) {
@@ -24,7 +24,7 @@ export default function Transactions({ userId }) {
     mutate,
   } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${userId}`,
-    fetcher
+    (url) => axios.get(url).then((res) => res.data) // ใช้ axios แทน fetcher
   );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,11 +43,18 @@ export default function Transactions({ userId }) {
 
   const handleSubmitSlip = async (slipFile) => {
     if (!selectedTransaction) return;
-
+  
     const formData = new FormData();
+  
+    // ส่งไฟล์สลิป
     formData.append("files", slipFile);
-    // formData.append("log", true); // ตรวจสอบสลิปซ้ำ
-
+  
+    // ตรวจสอบสลิปซ้ำ
+    formData.append("log", "true"); // ส่งเป็น string "true" หรือ "false"
+  
+    // ระบุยอดเงิน (optional)
+    formData.append("amount", selectedTransaction.amount);
+  
     try {
       Swal.fire({
         title: "กำลังดำเนินการ...",
@@ -57,24 +64,23 @@ export default function Transactions({ userId }) {
           Swal.showLoading();
         },
       });
-
-      const response = await fetch(NEXT_PUBLIC_SLIP_OK_API_URL, {
-        method: "POST",
+  
+      // เรียกใช้ API Route ใน Next.js
+      const response = await axios.post("/api/checkSlip", formData, {
         headers: {
-          "x-authorization": `SLIPOKC963LWT`,
+          "Content-Type": "multipart/form-data",
         },
-        body: formData,
       });
-
+  
+      // ปิด Modal ก่อนแสดง SweetAlert2
       handleCloseModal();
-
-      const result = await response.json();
-      console.log("Slip upload result:", result);
-
-      if (response.ok) {
+  
+      const result = response.data;
+  
+      if (response.status === 200) {
         const slipAmount = parseFloat(result.data.amount);
         const selectedAmount = parseFloat(selectedTransaction.amount);
-
+  
         if (selectedAmount !== slipAmount) {
           Swal.fire({
             icon: "error",
@@ -83,24 +89,24 @@ export default function Transactions({ userId }) {
           });
           return;
         }
-
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/wallet/${userId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: slipAmount }),
-        });
-
-        await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${selectedTransaction.id}`,
-          { method: "PUT" }
+  
+        await axios.put(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/wallet/${userId}`,
+          {
+            amount: slipAmount,
+          }
         );
-
+  
+        await axios.put(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${selectedTransaction.id}`
+        );
+  
         Swal.fire({
           icon: "success",
           title: "อัพโหลดสำเร็จ",
           text: "สลิปของคุณได้รับการตรวจสอบเรียบร้อย",
         });
-
+  
         mutate(); // Refresh transactions data
       } else {
         Swal.fire({
@@ -110,15 +116,17 @@ export default function Transactions({ userId }) {
         });
       }
     } catch (error) {
+      // ปิด Modal ก่อนแสดง SweetAlert2
+      handleCloseModal();
+  
       console.error("Error:", error);
       Swal.fire({
         icon: "error",
         title: "เกิดข้อผิดพลาด",
-        text: "ไม่สามารถตรวจสอบสลิปได้ กรุณาลองอีกครั้ง",
+        text: error.response?.data?.message || "ไม่สามารถตรวจสอบสลิปได้ กรุณาลองอีกครั้ง",
       });
     }
   };
-
   const handleCancelTransaction = async () => {
     if (!selectedTransaction) return;
 
@@ -132,19 +140,16 @@ export default function Transactions({ userId }) {
         },
       });
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${selectedTransaction.id}`,
-        { method: "DELETE" }
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/${selectedTransaction.id}`
       );
 
-      if (response.ok) {
-        Swal.fire({
-          icon: "success",
-          title: "ยกเลิกรายการสำเร็จ",
-          text: "รายการของคุณถูกยกเลิกแล้ว",
-        });
-        mutate(); // Refresh transactions data
-      }
+      Swal.fire({
+        icon: "success",
+        title: "ยกเลิกรายการสำเร็จ",
+        text: "รายการของคุณถูกยกเลิกแล้ว",
+      });
+      mutate(); // Refresh transactions data
     } catch (error) {
       console.error("Error cancelling transaction:", error);
       Swal.fire({

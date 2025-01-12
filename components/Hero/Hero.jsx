@@ -7,10 +7,13 @@ import Link from "next/link";
 
 const artTerms = [
   "ศิลปะดิจิทัล",
-  "NFTs",
-  "คริปโตอาร์ต",
   "ศิลปะเสมือนจริง",
   "ดิจิทัลคอลเลกชัน",
+  "อนิเมะ",
+  "การ์ตูน",
+  "ภาพวาด",
+  
+  
 ];
 
 export default function Hero({ artworkStats }) {

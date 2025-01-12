@@ -7,7 +7,7 @@ const SignInComponent = () => {
   return (
     <>
       <div className="sm:flex hidden flex-row justify-end gap-4 ">
-        <SignInButton className='pointer-events-auto'>
+        <SignInButton mode="modal" className='pointer-events-auto'>
           <UserRound  />
         </SignInButton>
       </div>

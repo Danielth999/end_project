@@ -57,7 +57,7 @@ export default function AuctionCard({ nft, onBid, onTimeUp, userId }) {
               alt={nft.name}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              priority
+              loading="lazy"
               className="transition-transform duration-300 object-cover"
             />
           </motion.div>
