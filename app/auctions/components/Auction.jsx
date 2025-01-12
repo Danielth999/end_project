@@ -8,9 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import AuctionCard from "./AuctionCard";
+import AuctionCard from "@/components/Auctions/AuctionCard";
 
-export default function Auction({ initialAuctionNFTs, onBidSuccess }) {
+export default function Auction({ initialAuctionNFTs, onBidSuccess ,userId}) {
   const [auctionNFTs, setAuctionNFTs] = useState(initialAuctionNFTs);
   const [sortOrder, setSortOrder] = useState("endingSoon");
 
@@ -67,6 +67,7 @@ export default function Auction({ initialAuctionNFTs, onBidSuccess }) {
             <AuctionCard
               key={nft.id}
               nft={nft}
+              userId={userId}
               onBid={handleBid}
               onTimeUp={() => handleTimeUp(nft.id)}
             />

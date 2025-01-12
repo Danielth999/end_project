@@ -46,7 +46,7 @@ export default function Transactions({ userId }) {
 
     const formData = new FormData();
     formData.append("files", slipFile);
-    formData.append("log", true); // ตรวจสอบสลิปซ้ำ
+    // formData.append("log", true); // ตรวจสอบสลิปซ้ำ
 
     try {
       Swal.fire({

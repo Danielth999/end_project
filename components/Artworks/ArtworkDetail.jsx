@@ -6,14 +6,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  ShoppingCart,
-  Heart,
-  Share2,
-  Facebook,
-  Twitter,
-  LinkIcon,
-} from "lucide-react";
+import { Heart, Share2, Facebook, Twitter, LinkIcon, Pencil } from "lucide-react";
 import Link from "next/link";
 import {
   Popover,
@@ -21,45 +14,73 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
-const ProductDetailPage = ({ artWorks }) => {
+const ProductDetailPage = ({ artWorks, userId }) => {
   const [isLiked, setIsLiked] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(artWorks.title);
+  const [description, setDescription] = useState(artWorks.description);
+  const [price, setPrice] = useState(artWorks.price);
+  const router = useRouter();
+
+  const isOwner = artWorks.userId === userId;
 
   const formattedDate = format(new Date(artWorks.createdAt), "dd MMMM yyyy", {
     locale: th,
   });
 
-  const handleShare = (platform) => {
-    const currentUrl = window.location.href;
-    let shareUrl;
-
-    switch (platform) {
-      case "facebook":
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-          currentUrl
-        )}`;
-        break;
-      case "twitter":
-        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-          currentUrl
-        )}&text=${encodeURIComponent(artWorks.title)}`;
-        break;
-      case "copy":
-        navigator.clipboard
-          .writeText(currentUrl)
-          .then(() => toast.success("คัดลอกลิงก์แล้ว"))
-          .catch(() => toast.error("ไม่สามารถคัดลอกลิงก์ได้"));
-        return;
-      default:
-        return;
-    }
-
-    window.open(shareUrl, "_blank");
-  };
-
   const preventContextMenu = (e) => {
     e.preventDefault();
     toast.error("ไม่อนุญาตให้ดาวน์โหลดรูปภาพ");
+  };
+
+  const handleSave = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/artworks/${artWorks.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title,
+            description,
+            price: parseFloat(price), // Ensure price is a number
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("ไม่สามารถอัปเดตผลงานได้");
+      }
+
+      const data = await response.json();
+      toast.success("อัปเดตผลงานเรียบร้อยแล้ว", {
+        position: "top-center",
+        duration: 3000,
+      });
+
+      setIsEditing(false);
+      router.refresh();
+    } catch (error) {
+      console.error("Error updating artwork:", error);
+      toast.error("ไม่สามารถอัปเดตผลงานได้", {
+        position: "top-center",
+        duration: 3000,
+      });
+    }
   };
 
   return (
@@ -69,7 +90,7 @@ const ProductDetailPage = ({ artWorks }) => {
           {/* Image Section */}
           <div
             className="relative w-full aspect-square rounded-lg overflow-hidden group"
-            onContextMenu={preventContextMenu} // ป้องกันการคลิกขวาเฉพาะที่รูป
+            onContextMenu={preventContextMenu}
           >
             <Image
               src={artWorks.imageUrl}
@@ -160,19 +181,63 @@ const ProductDetailPage = ({ artWorks }) => {
                 </Popover>
               </div>
             </div>
-            {/* <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 mb-8">
-              <Button className="flex-grow bg-green-500 hover:bg-green-600 transition-all duration-300">
-                ซื้อเลย
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-grow bg-transparent border-green-500 text-green-500 hover:bg-green-500 hover:text-white transition-all duration-300"
-              >
-                <ShoppingCart className="h-5 w-5 mr-2" />
-                เพิ่มลงตะกร้า
-              </Button>
-            </div> */}
-            <Card className="bg-gray-800 border-gray-700 overflow-hidden">
+            {/* Edit Button */}
+            {isOwner && (
+              <Dialog open={isEditing} onOpenChange={setIsEditing}>
+                <DialogTrigger asChild>
+                  <Button
+                    className="flex-grow bg-yellow-500 w-full hover:bg-yellow-600 transition-all duration-300"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    <Pencil className="h-5 w-5 mr-2" />
+                    แก้ไขผลงาน
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-gray-800 text-white border-gray-700">
+                  <DialogHeader>
+                    <DialogTitle>แก้ไขผลงาน</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="title">ชื่อผลงาน</Label>
+                      <Input
+                        id="title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        className="bg-gray-700 border-gray-600 text-white"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="description">รายละเอียด</Label>
+                      <Textarea
+                        id="description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="bg-gray-700 border-gray-600 text-white"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="price">ราคา (BTH)</Label>
+                      <Input
+                        id="price"
+                        type="number"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                        className="bg-gray-700 border-gray-600 text-white"
+                      />
+                    </div>
+                    <Button
+                      className="w-full bg-green-500 hover:bg-green-600"
+                      onClick={handleSave}
+                    >
+                      บันทึก
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+            {/* Owner Info */}
+            <Card className="bg-gray-800 border-gray-700 overflow-hidden mt-8">
               <CardContent className="p-4">
                 <div className="grid grid-cols-2 gap-4 text-sm md:text-base">
                   <div>
@@ -181,9 +246,7 @@ const ProductDetailPage = ({ artWorks }) => {
                       href={`/profile/${artWorks.userId}`}
                       className="font-semibold hover:underline hover:text-green-500"
                     >
-                      {artWorks.User?.firstName}
-                      <span> </span>
-                      {artWorks.User?.lastName}
+                      {artWorks.User?.firstName} {artWorks.User?.lastName}
                     </Link>
                   </div>
                   <div>

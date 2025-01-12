@@ -15,6 +15,7 @@ export async function GET(request, { params }) {
         Artwork: {
           select: {
             title: true,
+            imageUrl: true,
           },
         },
       },
@@ -28,6 +29,7 @@ export async function GET(request, { params }) {
       actionType: item.actionType,
       artworkId: item.artworkId,
       artworkName: item.Artwork?.title || "Unknown Artwork",
+      imageUrl: item.Artwork?.imageUrl || null,
       amount: item.amount ? parseFloat(item.amount.toString()) : null,
       downloadUrl: item.downloadUrl,
       createdAt: item.createdAt.toISOString(),

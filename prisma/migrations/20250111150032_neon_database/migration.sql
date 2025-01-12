@@ -166,7 +166,7 @@ CREATE TABLE "Transaction" (
     "amount" DECIMAL(10,2) NOT NULL,
     "createdAt" TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "status" "TransactionStatus",
-    "bankAccountId" TEXT,
+    "bankAccountId" UUID,
 
     CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
 );

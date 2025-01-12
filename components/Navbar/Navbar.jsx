@@ -1,6 +1,7 @@
+// Navbar.jsx
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import {
   Home,
@@ -23,7 +24,7 @@ import Profile from "./Profile";
 import WalletComponent from "./Wallet";
 import Cart from "./Cart";
 import Link from "next/link";
-import axios from "axios";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 const navlinks = [
@@ -34,7 +35,7 @@ const navlinks = [
   },
   {
     name: "ภาพศิลปะ",
-    link: "/products",
+    link: "/artworks",
     icon: <LayoutGrid className="w-6 h-6 dark:text-[#20b256]" />,
   },
   {
@@ -64,37 +65,25 @@ const Navbar = ({ userId }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const router = useRouter();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
+  // ฟังก์ชันค้นหา
   const handleSearch = async () => {
-    if (!searchTerm.trim()) {
-      toast.error("กรุณากรอกคำค้นหา");
-      return;
+    if (searchTerm.trim() === "") {
+      // ถ้าข้อความค้นหาว่าง ให้ redirect ไปยังหน้า artworks โดยไม่ส่ง query parameter search
+      router.push("/artworks");
+    } else {
+      // ถ้ามีข้อความค้นหา ให้ redirect ไปยังหน้า artworks พร้อมส่ง query parameter search
+      router.push(`/artworks?search=${encodeURIComponent(searchTerm)}`);
     }
+  };
 
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/artworks/search?query=${searchTerm}`
-      );
-
-      if (response.status === 200) {
-        setSearchResults(response.data);
-        toast.success(`พบผลลัพธ์ ${response.data.length} รายการ`);
-      }
-    } catch (error) {
-      console.error("Error searching artworks:", error);
-      toast.error("ไม่พบผลลัพธ์ที่ตรงกับคำค้นหา");
+  // ตรวจสอบการกด Enter ใน input
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
     }
   };
 
@@ -119,18 +108,14 @@ const Navbar = ({ userId }) => {
         <input
           type="text"
           placeholder="ค้นหางานศิลปะ"
-          className="flex w-full text-[14px] placeholder:text-[#4b5264] text-black dark:text-white bg-transparent outline-none"
+          className="flex w-full text-[14px] placeholder:text-white  text-black dark:text-white bg-transparent  rounded-[100px] px-4 "
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSearch();
-            }
-          }}
+          onKeyDown={handleKeyDown} // ตรวจสอบการกด Enter
         />
         <div
           className="w-[72px] h-full rounded-[20px] bg-[#2dac5c] dark:bg-[#20b256] flex justify-center items-center cursor-pointer"
-          onClick={handleSearch}
+          onClick={handleSearch} // คลิกที่ไอคอนค้นหา
         >
           <Search size={15} className="text-white" />
         </div>
@@ -187,33 +172,6 @@ const Navbar = ({ userId }) => {
         )}
         <Profile />
       </div>
-
-      {/* Search Results */}
-      {searchResults.length > 0 && (
-        <div className="absolute top-16 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 z-50">
-          <ul className="space-y-2">
-            {searchResults.map((artwork) => (
-              <li key={artwork.id}>
-                <Link href={`/artworks/${artwork.id}`}>
-                  <div className="flex items-center gap-3 text-sm text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg">
-                    <img
-                      src={artwork.imageUrl}
-                      alt={artwork.title}
-                      className="w-10 h-10 rounded-lg object-cover"
-                    />
-                    <div>
-                      <p className="font-medium">{artwork.title}</p>
-                      <p className="text-gray-500 dark:text-gray-400">
-                        {artwork.Category?.name || "Uncategorized"}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </nav>
   );
 };

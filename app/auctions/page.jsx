@@ -3,7 +3,14 @@ import useSWR from "swr";
 import Auction from "./components/Auction";
 import fetcher from "@/lib/fetcher";
 import Loading from "@/components/Loading";
+import { useUser } from "@clerk/nextjs";
+
 export default function AuctionsPage() {
+  const { user, isSignedIn } = useUser();
+  const userId = isSignedIn ? user.id : null; // ประกาศ userId นอกบล็อก if
+
+
+
   const {
     data: auctionNFTs,
     error,
@@ -16,7 +23,9 @@ export default function AuctionsPage() {
   const handleBidSuccess = async (updatedAuction) => {
     await mutate((data) =>
       data.map((auction) =>
-        auction.id === updatedAuction.id ? { ...auction, ...updatedAuction } : auction
+        auction.id === updatedAuction.id
+          ? { ...auction, ...updatedAuction }
+          : auction
       )
     );
   };
@@ -25,7 +34,10 @@ export default function AuctionsPage() {
   if (error) return <div>Error loading auctions: {error.message}</div>;
 
   return (
-    <Auction initialAuctionNFTs={auctionNFTs} onBidSuccess={handleBidSuccess} />
+    <Auction
+      userId={userId} // ส่ง userId ไปยังคอมโพเนนต์ Auction
+      initialAuctionNFTs={auctionNFTs}
+      onBidSuccess={handleBidSuccess}
+    />
   );
 }
-

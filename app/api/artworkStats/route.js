@@ -16,9 +16,7 @@ export async function GET() {
     // นับจำนวน Artwork ที่มีการประมูล
     const auctionCount = await prisma.artwork.count({
       where: {
-        auctionStartAt: {
-          not: null,
-        },
+        typeId: 2, // ประเภทการประมูล
       },
     });
 

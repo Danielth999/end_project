@@ -14,6 +14,7 @@ export async function GET(req, { params }) {
     const artWorks = await prisma.Artwork.findMany({
       where: {
         userId: id,
+        typeId: 1, // ประเภทการขาย
       },
       include: {
         Category: true,

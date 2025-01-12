@@ -1,17 +1,17 @@
 "use client";
 
 import useSWR from "swr";
-import ArtworkCard from "@/components/Artworks/ArtworkCard";
+import AuctionCard from "@/components/Auctions/AuctionCard";
 import fetcher from "@/lib/fetcher";
 
 const ArtworkContainer = ({ uid }) => {
   // ใช้ SWR ดึงข้อมูล
   const {
-    data: artworks,
+    data: Auction,
     error,
     isLoading,
   } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/myArtwork/${uid}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${uid}`,
     fetcher,
     {
       revalidateOnFocus: true, // รีเฟรชข้อมูลเมื่อกลับมาที่หน้าจอ
@@ -28,19 +28,21 @@ const ArtworkContainer = ({ uid }) => {
   }
 
   if (error) {
-    return <div className="flex justify-center items-center h-96">ยังไม่มีผลงาน</div>;
+    return (
+      <div className="flex justify-center items-center h-96">ยังไม่มีผลงาน</div>
+    );
   }
 
   return (
     <div>
       <div className="mb-10">
         <h1 className="text-2xl font-bold ">
-          ภาพศิลปะทั้งหมด (จำนวน {artworks.length} ภาพ)
+          ภาพศิลปะทั้งหมด (จำนวน {Auction.length} ภาพ)
         </h1>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {artworks.map((artwork) => (
-          <ArtworkCard key={artwork.id} artWorks={artwork} userId={uid} />
+        {Auction.map((auctions) => (
+          <AuctionCard key={auctions.id} nft={auctions} userId={uid} />
         ))}
       </div>
     </div>

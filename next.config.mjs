@@ -47,6 +47,11 @@ const nextConfig = {
         hostname: "qtwseyjmrxlktgaecvbh.supabase.co", // Add Supabase hostname
         pathname: "/**", // Allow all paths under Supabase hostname
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com", // เพิ่ม hostname ของ Cloudinary
+        pathname: "/**", // อนุญาตให้ใช้ทุก path ภายใต้ hostname นี้
+      },
     ],
   },
 };

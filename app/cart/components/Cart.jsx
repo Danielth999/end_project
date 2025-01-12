@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useSWR from "swr";
 import CartList from "./CartList";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import fetcher from "@/lib/fetcher";
 import toast from "react-hot-toast";
-import Link from "next/link"; // ใช้ Link แทน useRouter
+import Link from "next/link";
+import useCartStore from "@/stores/useCartStore";
 
 export default function Cart({ userId }) {
   const {
@@ -17,26 +18,32 @@ export default function Cart({ userId }) {
     mutate,
   } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/cart/${userId}`, fetcher);
 
+  const { decrementCartCount, setCartCount, fetchCartCount } = useCartStore();
+
   // ใช้ local state เพื่อเก็บข้อมูลตะกร้า
   const [localCartItems, setLocalCartItems] = useState([]);
 
-  // อัปเดต local state เมื่อ cartData เปลี่ยนแปลง
-  useState(() => {
+  // ดึงจำนวนสินค้าในตะกร้าเมื่อ component โหลด
+  useEffect(() => {
+    fetchCartCount(userId);
+  }, [userId, fetchCartCount]);
+
+  // อัปเดต local state และ store เมื่อ cartData เปลี่ยนแปลง
+  useEffect(() => {
     if (cartData?.cartItems) {
       setLocalCartItems(cartData.cartItems);
+      setCartCount(cartData.totalItems); // อัปเดตจำนวนสินค้าใน store
     }
-  }, [cartData]);
+  }, [cartData, setCartCount]);
 
   const updateQuantity = async (id, newQuantity) => {
-    // ค้นหาสินค้าใน local state
     const itemIndex = localCartItems.findIndex((item) => item.id === id);
     if (itemIndex === -1) return;
 
-    // สร้างสำเนาของตะกร้า
     const updatedCartItems = [...localCartItems];
     const oldQuantity = updatedCartItems[itemIndex].quantity;
 
-    // อัปเดต local state ทันที (optimistic update)
+    // Optimistic update
     updatedCartItems[itemIndex] = {
       ...updatedCartItems[itemIndex],
       quantity: newQuantity,
@@ -44,7 +51,6 @@ export default function Cart({ userId }) {
     setLocalCartItems(updatedCartItems);
 
     try {
-      // ส่ง request ไปยัง server
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/cart/${id}`,
         {
@@ -58,13 +64,12 @@ export default function Cart({ userId }) {
         throw new Error("Failed to update quantity");
       }
 
-      // รีเฟรชข้อมูลตะกร้า
       mutate();
       toast.success("อัปเดตจำนวนสินค้าสำเร็จ");
     } catch (err) {
       console.error("Failed to update quantity:", err);
 
-      // ย้อนกลับ local state หาก request ล้มเหลว
+      // Rollback on error
       updatedCartItems[itemIndex] = {
         ...updatedCartItems[itemIndex],
         quantity: oldQuantity,
@@ -75,19 +80,17 @@ export default function Cart({ userId }) {
   };
 
   const removeItem = async (id) => {
-    // ค้นหาสินค้าใน local state
     const itemIndex = localCartItems.findIndex((item) => item.id === id);
     if (itemIndex === -1) return;
 
-    // สร้างสำเนาของตะกร้า
     const updatedCartItems = [...localCartItems];
     const removedItem = updatedCartItems.splice(itemIndex, 1);
 
-    // อัปเดต local state ทันที (optimistic update)
+    // Optimistic update
     setLocalCartItems(updatedCartItems);
+    decrementCartCount();
 
     try {
-      // ส่ง request ไปยัง server
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/cart/${id}`,
         {
@@ -99,13 +102,12 @@ export default function Cart({ userId }) {
         throw new Error("Failed to remove item");
       }
 
-      // รีเฟรชข้อมูลตะกร้า
       mutate();
       toast.success("ลบสินค้าสำเร็จ");
     } catch (err) {
       console.error("Failed to remove item:", err);
 
-      // ย้อนกลับ local state หาก request ล้มเหลว
+      // Rollback on error
       updatedCartItems.splice(itemIndex, 0, removedItem[0]);
       setLocalCartItems(updatedCartItems);
       toast.error("ไม่สามารถลบสินค้าได้");
@@ -130,7 +132,6 @@ export default function Cart({ userId }) {
     return <p className="text-center text-gray-500">ตะกร้าของคุณว่างเปล่า</p>;
   }
 
-  // คำนวณราคารวมจาก local state
   const totalPrice = localCartItems.reduce(
     (sum, item) => sum + item.Artwork.price * item.quantity,
     0

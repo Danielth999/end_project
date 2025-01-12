@@ -1,6 +1,6 @@
 import React from "react";
 import Hero from "../Hero/Hero";
-import LatestArtwork from "../LatestArtwork/LatestArtwork";
+import LatestArtwork from "../Artworks/ArtworkCard";
 import PopularArtists from "../PopularArtists/PopularArtists";
 import { auth } from "@clerk/nextjs/server";
 async function fetchUsers() {

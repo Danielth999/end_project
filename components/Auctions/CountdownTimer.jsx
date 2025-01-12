@@ -2,16 +2,27 @@
 
 import { useState, useEffect } from "react";
 
-export default function CountdownTimer({ endTime, duration }) {
+export default function CountdownTimer({ endTime, duration, onTimeUp }) {
   const [timeLeft, setTimeLeft] = useState(getTimeLeft(new Date(endTime)));
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(getTimeLeft(new Date(endTime)));
+      const remainingTime = getTimeLeft(new Date(endTime));
+      setTimeLeft(remainingTime);
+
+      if (
+        remainingTime.days === 0 &&
+        remainingTime.hours === 0 &&
+        remainingTime.minutes === 0 &&
+        remainingTime.seconds === 0
+      ) {
+        clearInterval(timer);
+        if (onTimeUp) onTimeUp(); // เรียก callback เมื่อหมดเวลา
+      }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [endTime]);
+  }, [endTime, onTimeUp]);
 
   function getTimeLeft(endTime) {
     const total = endTime.getTime() - Date.now();

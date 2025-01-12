@@ -14,12 +14,10 @@ export async function GET() {
         auctionEndAt: { lte: now }, // สิ้นสุด <= เวลาปัจจุบัน
       },
       include: {
-       
         Bids: {
           orderBy: { amount: "desc" }, // เรียงลำดับราคาสูงสุดก่อน
           take: 1, // ดึงเฉพาะ Bid สูงสุด
         },
-        
       },
     });
 
@@ -61,18 +59,31 @@ export async function GET() {
         auctionEndAt: { gte: now }, // สิ้นสุด >= เวลาปัจจุบัน
       },
       include: {
+        User: true, // ดึงข้อมูลผู้ใช้งาน
+        Category: true, // ดึงข้อมูลประเภท
         Bids: {
           orderBy: { amount: "desc" }, // เรียงราคาจากสูงไปต่ำ
           take: 1, // ดึงเฉพาะ Bid สูงสุด
         },
-        
       },
     });
 
     // แปลงข้อมูลให้เป็นรูปแบบที่ต้องการ
     const formattedAuctions = activeAuctions.map((auction) => ({
+      // user
+      user: {
+        id: auction.User.id,
+        name: auction.User.firstName,
+      },
+      // category
+      category: {
+        id: auction.Category.id,
+        name: auction.Category.name,
+      },
+      // ข้อมูลการประมูล
       id: auction.id,
       name: auction.title,
+      createdAt: auction.createdAt,
       currentBid:
         auction.Bids.length > 0
           ? parseFloat(auction.Bids[0].amount)

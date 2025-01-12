@@ -9,8 +9,8 @@ export default function ProfileStats({ stats }) {
       label: "ราคาต่ำสุด",
       value: stats?.minPrice ? `${stats.minPrice} บาท` : 0,
     },
-    { label: "จำนวนการประมูล", value: stats?.auctionCount || 0 },
-    { label: "จำนวนที่ขายสำเร็จ", value: stats?.salesCount || 0 },
+    { label: "จำนวนการประมูล", value: stats?.activeAuctionCount || 0 },
+    { label: "จำนวนที่ขายสำเร็จ", value: stats?.totalSalesCount || 0 },
   ];
 
   return (

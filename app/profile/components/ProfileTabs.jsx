@@ -2,6 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ArtworkContainer from "./Artwork/ArtworkContainer";
+import AuctionContainer from "./Auction/AuctionContainer";
 import { useState } from "react";
 
 export default function ProfileTabs({ userId }) {
@@ -14,7 +15,9 @@ export default function ProfileTabs({ userId }) {
           value="created"
           onClick={() => setActiveTab("created")}
           className={`px-4 py-2 rounded-md transition-all ${
-            activeTab === "created" ? "bg-green-600 text-white" : "text-gray-400"
+            activeTab === "created"
+              ? "bg-green-600 text-white"
+              : "text-gray-400"
           }`}
         >
           ผลงานที่สร้าง
@@ -23,17 +26,19 @@ export default function ProfileTabs({ userId }) {
           value="collected"
           onClick={() => setActiveTab("collected")}
           className={`px-4 py-2 rounded-md transition-all ${
-            activeTab === "collected" ? "bg-green-600 text-white" : "text-gray-400"
+            activeTab === "collected"
+              ? "bg-green-600 text-white"
+              : "text-gray-400"
           }`}
         >
-          ผลงานที่สะสม
+          ผลงานประมูล
         </TabsTrigger>
       </TabsList>
       <TabsContent value="created">
         <ArtworkContainer uid={userId} />
       </TabsContent>
       <TabsContent value="collected">
-        <p className="text-center text-gray-400 py-12">ยังไม่มีผลงานที่สะสม</p>
+        <AuctionContainer uid={userId} />
       </TabsContent>
     </Tabs>
   );
