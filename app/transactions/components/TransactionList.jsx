@@ -17,8 +17,6 @@ export default function TransactionList({
   onUploadSlip,
   onCancelTransaction,
 }) {
-
-
   const formatAmount = (amount, type) => {
     const formattedAmount = new Intl.NumberFormat("th-TH", {
       style: "currency",
@@ -73,7 +71,7 @@ export default function TransactionList({
         {transactions.map((transaction, index) => (
           <TableRow key={transaction.id}>
             <TableCell>{index + 1}</TableCell>
-            <TableCell>
+            <TableCell className="text-center ">
               {format(new Date(transaction.createdAt), "dd MMM yyyy HH:mm", {
                 locale: th,
               })}
@@ -91,10 +89,10 @@ export default function TransactionList({
                 </span>
               )}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="text-center ">
               {formatAmount(transaction.amount, transaction.transactionType)}
             </TableCell>
-            <TableCell className="text-center">
+            <TableCell className="text-center ">
               <Badge className={getStatusColor(transaction.status)}>
                 {translateStatus(transaction.status)}
               </Badge>
