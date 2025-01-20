@@ -18,7 +18,7 @@ export default function ProfileStats({ stats }) {
       {statsData.map((stat, index) => (
         <Card key={index} className="bg-gray-800 border-gray-700">
           <CardContent className="p-6">
-            <div className="text-3xl font-bold">{stat.value}</div>
+            <div className="text-3xl font-bold text-white">{stat.value}</div>
             <div className="text-gray-400">{stat.label}</div>
           </CardContent>
         </Card>

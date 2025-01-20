@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import useCartStore from "@/stores/useCartStore";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-
+import { useUser } from "@clerk/nextjs";
 import {
   Card,
   CardContent,
@@ -33,16 +33,18 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Trash2 } from 'lucide-react';
+import { Trash2 } from "lucide-react";
 
 const ArtworkCard = ({ artWorks, userId }) => {
+
   const [isAdding, setIsAdding] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const imageRef = useRef(null);
   const { updateCartCount } = useCartStore();
   const router = useRouter();
+  const { isSignedIn } = useUser();
 
-  const isOwner = artWorks.userId === userId;
+  const isOwner = isSignedIn && artWorks.userId === userId;
 
   const createdAtDate = artWorks.createdAt
     ? new Date(artWorks.createdAt)
@@ -178,16 +180,16 @@ const ArtworkCard = ({ artWorks, userId }) => {
           <motion.div
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.3 }}
-            className="w-full h-full"
+            className="w-full h-full relative" // เพิ่ม relative ที่นี่
           >
             <Image
               ref={imageRef}
               src={artWorks.imageUrl}
               alt={artWorks.title}
               fill
-              sizes="100vw"
+              sizes="(max-width: 768px) 100vw, 50vw" // ปรับ sizes ให้เหมาะสม
               loading="lazy"
-              className="transition-transform duration-300"
+              className="object-cover transition-transform duration-300"
             />
           </motion.div>
           <motion.div
@@ -201,7 +203,10 @@ const ArtworkCard = ({ artWorks, userId }) => {
               {artWorks.Category?.name || "Uncategorized"}
             </Badge>
             {isOwner && (
-              <Badge variant="secondary"  className="border-[#2dac5c] text-[#2dac5c]">
+              <Badge
+                variant="secondary"
+                className="border-[#2dac5c] text-[#2dac5c]"
+              >
                 คุณเป็นเจ้าของ
               </Badge>
             )}
@@ -251,7 +256,9 @@ const ArtworkCard = ({ artWorks, userId }) => {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-gray-700 text-white hover:bg-gray-600">ยกเลิก</AlertDialogCancel>
+                  <AlertDialogCancel className="bg-gray-700 text-white hover:bg-gray-600">
+                    ยกเลิก
+                  </AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDelete}
                     className="bg-red-600 hover:bg-red-700"
@@ -275,4 +282,3 @@ const ArtworkCard = ({ artWorks, userId }) => {
 };
 
 export default ArtworkCard;
-

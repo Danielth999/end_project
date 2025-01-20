@@ -6,7 +6,14 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Share2, Facebook, Twitter, LinkIcon, Pencil } from "lucide-react";
+import {
+  Heart,
+  Share2,
+  Facebook,
+  Twitter,
+  LinkIcon,
+  Pencil,
+} from "lucide-react";
 import Link from "next/link";
 import {
   Popover,
@@ -244,14 +251,14 @@ const ProductDetailPage = ({ artWorks, userId }) => {
                     <p className="text-sm text-gray-400">ผู้สร้าง</p>
                     <Link
                       href={`/profile/${artWorks.userId}`}
-                      className="font-semibold hover:underline hover:text-green-500"
+                      className="font-semibold hover:underline text-white hover:text-green-500"
                     >
                       {artWorks.User?.firstName} {artWorks.User?.lastName}
                     </Link>
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">วันที่สร้าง</p>
-                    <p className="font-semibold">{formattedDate}</p>
+                    <p className="font-semibold text-white">{formattedDate}</p>
                   </div>
                 </div>
               </CardContent>

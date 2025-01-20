@@ -12,8 +12,6 @@ const artTerms = [
   "อนิเมะ",
   "การ์ตูน",
   "ภาพวาด",
-
-  
 ];
 
 export default function Hero({ artworkStats }) {
@@ -26,7 +24,7 @@ export default function Hero({ artworkStats }) {
 
     const animateText = () => {
       const currentTerm = artTerms[currentTermIndex];
-      
+
       if (!isDeleting) {
         if (displayText !== currentTerm) {
           setDisplayText(currentTerm.slice(0, displayText.length + 1));
@@ -78,7 +76,9 @@ export default function Hero({ artworkStats }) {
                 asChild={true}
                 className="bg-[#2dac5c] hover:bg-[#2dac5c]/90"
               >
-                <Link href={"/artworks"} className="text-whites">สำรวจเพิ่มเติม</Link>
+                <Link href={"/artworks"} className="text-whites">
+                  สำรวจเพิ่มเติม
+                </Link>
               </Button>
               <Button
                 asChild
@@ -141,8 +141,8 @@ export default function Hero({ artworkStats }) {
                         src={card.imageUrl}
                         alt="Digital Artwork"
                         fill
-                        sizes="100vw"
-                        priority
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        loading="lazy"
                         className="object-cover rounded-lg"
                       />
                     </div>

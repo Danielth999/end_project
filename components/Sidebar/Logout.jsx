@@ -18,7 +18,7 @@ export default function Signout() {
           <TooltipTrigger>
             {/* เมื่อคลิกจะเรียก handleSignOut */}
             <SignOutButton >
-              <LogOut className="w-6 h-6 dark:text-[#20b256]" />
+              <LogOut className="w-6 h-6 text-red-500" />
             </SignOutButton>
           </TooltipTrigger>
           <TooltipContent>ออกจากระบบ</TooltipContent>

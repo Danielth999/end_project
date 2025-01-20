@@ -49,14 +49,14 @@ export default function AuctionCard({ nft, onBid, onTimeUp, userId }) {
           <motion.div
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.3 }}
-            className="w-full h-full"
+            className="w-full h-full relative" // เพิ่ม relative ที่นี่
           >
             <Image
               ref={imageRef}
               src={nft.image}
               alt={nft.name}
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="(max-width: 768px) 100vw, 50vw" // ปรับ sizes ให้เหมาะสม
               loading="lazy"
               className="transition-transform duration-300 object-cover"
             />
@@ -128,6 +128,7 @@ export default function AuctionCard({ nft, onBid, onTimeUp, userId }) {
                     src={nft.image}
                     alt={nft.name}
                     fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
                   />
                 </div>
@@ -164,4 +165,3 @@ export default function AuctionCard({ nft, onBid, onTimeUp, userId }) {
     </motion.div>
   );
 }
-

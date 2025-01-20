@@ -24,16 +24,16 @@ export default function ProfileHeader({ user }) {
           @{user.firstName || "username"}
         </p>
         <div className="flex justify-center md:justify-start space-x-4 mb-4">
-          <Button variant="outline" size="icon">
+          <Button variant="" size="icon">
             <Twitter className="h-5 w-5" />
           </Button>
-          <Button variant="outline" size="icon">
-            <Globe className="h-5 w-5" />
+          <Button variant="" size="icon">
+            <Globe className="h-5 w-5 " />
           </Button>
-          <Button variant="outline" size="icon">
+          <Button variant="" size="icon">
             <Share2 className="h-5 w-5" />
           </Button>
-          <Button variant="outline" size="icon">
+          <Button variant="" size="icon">
             <MoreHorizontal className="h-5 w-5" />
           </Button>
         </div>

@@ -1,19 +1,8 @@
-// Navbar.jsx
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import {
-  Home,
-  LayoutGrid,
-  MessageCircle,
-  Newspaper,
-  Gavel,
-  Plus,
-  Menu,
-  X,
-  Search,
-} from "lucide-react";
+import { Home, LayoutGrid, MessageCircle, Newspaper, Gavel, Plus, Menu, X, Search } from 'lucide-react';
 import {
   Tooltip,
   TooltipTrigger,
@@ -31,32 +20,22 @@ const navlinks = [
   {
     name: "Home",
     link: "/",
-    icon: <Home className="w-6 h-6 dark:text-[#20b256]" />,
+    icon: <Home className="w-6 h-6 text-[#20b256]" />,
   },
   {
     name: "ภาพศิลปะ",
     link: "/artworks",
-    icon: <LayoutGrid className="w-6 h-6 dark:text-[#20b256]" />,
+    icon: <LayoutGrid className="w-6 h-6 text-[#20b256]" />,
   },
   {
     name: "ประมูล",
     link: "/auctions",
-    icon: <Gavel className="w-6 h-6 dark:text-[#20b256]" />,
+    icon: <Gavel className="w-6 h-6 text-[#20b256]" />,
   },
   {
-    name: "พูดคุย",
-    link: "/forum",
-    icon: <MessageCircle className="w-6 h-6 dark:text-[#20b256]" />,
-  },
-  {
-    name: "ข่าวสาร",
-    link: "/blog",
-    icon: <Newspaper className="w-6 h-6 dark:text-[#20b256]" />,
-  },
-  {
-    name: "สร้าง NFTs",
-    link: "/create-nfts",
-    icon: <Plus className="w-6 h-6 dark:text-[#20b256]" />,
+    name: "สร้างผลงาน",
+    link: "/create-artworks",
+    icon: <Plus className="w-6 h-6 text-[#20b256]" />,
   },
 ];
 
@@ -69,108 +48,125 @@ const Navbar = ({ userId }) => {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  // ฟังก์ชันค้นหา
   const handleSearch = async () => {
     if (searchTerm.trim() === "") {
-      // ถ้าข้อความค้นหาว่าง ให้ redirect ไปยังหน้า artworks โดยไม่ส่ง query parameter search
       router.push("/artworks");
     } else {
-      // ถ้ามีข้อความค้นหา ให้ redirect ไปยังหน้า artworks พร้อมส่ง query parameter search
       router.push(`/artworks?search=${encodeURIComponent(searchTerm)}`);
     }
   };
 
-  // ตรวจสอบการกด Enter ใน input
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <nav
-      className={`sticky top-0 z-50 flex items-center justify-between gap-6 px-4 py-2 transition-all duration-300 ${
+      className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-md"
+          ? "bg-gray-900/80 backdrop-blur-md shadow-md"
           : "bg-transparent"
       }`}
     >
-      {/* Hamburger Menu */}
-      <button
-        className="md:hidden flex items-center justify-center w-10 h-10 bg-gray-900 text-white rounded-full"
-        onClick={toggleMenu}
-      >
-        {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-      </button>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo and Hamburger Menu */}
+          <div className="flex items-center">
+            <button
+              className="md:hidden flex items-center justify-center w-10 h-10 bg-gray-900 text-white rounded-full"
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+            <Link href="/" className="ml-4 md:ml-0">
+              <span className="text-2xl font-bold text-white">Art Space</span>
+            </Link>
+          </div>
 
-      {/* Search Bar */}
-      <div className="flex-1 flex flex-row max-w-[458px] py-2 pl-4 pr-2 h-[52px] dark:bg-gray-900 bg-[#dbe4e9] rounded-[100px]">
-        <input
-          type="text"
-          placeholder="ค้นหางานศิลปะ"
-          className="flex w-full text-[14px] placeholder:text-white  text-black dark:text-white bg-transparent  rounded-[100px] px-4 "
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyDown={handleKeyDown} // ตรวจสอบการกด Enter
-        />
-        <div
-          className="w-[72px] h-full rounded-[20px] bg-[#2dac5c] dark:bg-[#20b256] flex justify-center items-center cursor-pointer"
-          onClick={handleSearch} // คลิกที่ไอคอนค้นหา
-        >
-          <Search size={15} className="text-white" />
-        </div>
-      </div>
+          {/* Search Bar */}
+          <div className="flex-1 max-w-[458px] mx-4">
+            <div className="relative w-full">
+              <input
+                type="text"
+                placeholder="ค้นหางานศิลปะ"
+                className="w-full py-2 pl-4 pr-10 text-sm bg-gray-900 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-[#20b256]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+              />
+              <button
+                className="absolute right-0 top-0 mt-2 mr-2"
+                onClick={handleSearch}
+                aria-label="Search"
+              >
+                <Search size={20} className="text-white" />
+              </button>
+            </div>
+          </div>
 
-      {/* Mobile Profile */}
-      <div className="md:hidden flex items-center gap-4">
-        <Profile />
-      </div>
-
-      {/* Dropdown Menu for Mobile */}
-      {isMenuOpen && (
-        <div className="absolute top-16 left-0 right-0 bg-white dark:bg-gray-900 shadow-lg rounded-lg p-4 z-50">
-          <ul className="flex flex-col items-start space-y-4">
-            {navlinks.map((link) => (
-              <li key={link.name}>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <Link href={link.link}>
-                        <div className="flex items-center gap-3 text-sm text-black dark:text-white">
-                          {link.icon}
-                          <span>{link.name}</span>
-                        </div>
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" align="center">
-                      {link.name}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </li>
-            ))}
-          </ul>
-          {/* Mobile Profile and Wallet */}
-          <div className="flex flex-col mt-6 gap-4 border-t border-gray-300 pt-4">
+          {/* User Actions */}
+          <div className="flex items-center space-x-4">
             {isSignedIn && (
-              <div className="flex items-center gap-4">
+              <>
                 <WalletComponent />
                 <Cart userId={userId} />
-              </div>
+              </>
             )}
+            <Profile />
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Desktop Navigation */}
-      <div className="hidden md:flex items-center gap-4">
+      {/* Mobile Menu */}
+      <div
+        className={`md:hidden transition-all duration-300 ease-in-out ${
+          isMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+        } overflow-hidden`}
+      >
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          {navlinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.link}
+              className="flex items-center space-x-3 text-white hover:bg-gray-800 px-3 py-2 rounded-md text-base font-medium"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {link.icon}
+              <span>{link.name}</span>
+            </Link>
+          ))}
+        </div>
         {isSignedIn && (
-          <>
-            <WalletComponent />
-            <Cart userId={userId} />
-          </>
+          <div className="px-4 py-3 border-t border-gray-700">
+            <div className="flex items-center space-x-4">
+              <WalletComponent />
+              <Cart userId={userId} />
+            </div>
+          </div>
         )}
-        <Profile />
       </div>
     </nav>
   );

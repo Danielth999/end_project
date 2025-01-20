@@ -1,256 +1,99 @@
 import React from "react";
-import Link from "next/link"; // Import Link from Next.js
+import { Facebook, Twitter, Instagram } from 'lucide-react';
 
-export default function FooterDarkTheme() {
+const Footer = () => {
   return (
-    <>
-      <footer className="w-full text-slate-400">
-        <div className="border-t border-slate-900 bg-slate-800 pb-12 pt-16 text-sm">
-          <div className="container mx-auto px-6">
-            <div className="grid grid-cols-4 gap-6 md:grid-cols-8 lg:grid-cols-12">
-              <nav
-                className="col-span-2 md:col-span-4 lg:col-span-3"
-                aria-labelledby="footer-product-dark"
-              >
-                <h3
-                  className="mb-6 text-base font-medium text-white"
-                  id="footer-product-dark"
-                >
-                  Product
-                </h3>
-                <ul>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/features"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Features
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/customers"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Customers
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/why-us"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Why us?
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/pricing"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Pricing
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
-              <nav
-                className="col-span-2 md:col-span-4 lg:col-span-3"
-                aria-labelledby="footer-docs-dark"
-              >
-                <h3
-                  className="mb-6 text-base font-medium text-white"
-                  id="footer-docs-dark"
-                >
-                  Docs & help
-                </h3>
-                <ul>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/documentation"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Documentation
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/training"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Training
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/system-status"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      System status
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/faqs"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      FAQs
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/help-center"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Help Center
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
-              <nav
-                className="col-span-2 md:col-span-4 lg:col-span-3"
-                aria-labelledby="footer-about-dark"
-              >
-                <h3
-                  className="mb-6 text-base font-medium text-white"
-                  id="footer-about-dark"
-                >
-                  About us
-                </h3>
-                <ul>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/about-us"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      About us
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/careers"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Careers
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/leadership"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Leadership
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/blog"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Blog
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/events"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Events
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
-              <nav
-                className="col-span-2 md:col-span-4 lg:col-span-3"
-                aria-labelledby="footer-get-in-touch-dark"
-              >
-                <h3
-                  className="mb-6 text-base font-medium text-white"
-                  id="footer-get-in-touch-dark"
-                >
-                  Get in touch
-                </h3>
-                <ul>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/contact"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Contact
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/support"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Support
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/partners"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Partners
-                    </Link>
-                  </li>
-                  <li className="mb-2 leading-6">
-                    <Link
-                      href="/join-research"
-                      className="transition-colors duration-300 hover:text-teal-500 focus:text-teal-600"
-                    >
-                      Join research
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
+    <footer className="text-white bg-gradient-to-b from-[#0a0d12] to-gray-900">
+      {/* Main footer */}
+      <div className="pt-16 pb-12 text-sm">
+        <div className="container px-6 mx-auto">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
+            {/* เกี่ยวกับเรา */}
+            <div className="col-span-1 md:col-span-2 lg:col-span-2">
+              <h3 className="mb-6 text-2xl font-bold text-[#20b256]">Art Space</h3>
+              <p className="text-gray-300 mb-6">
+                Art Space เป็นแพลตฟอร์มสำหรับการค้นพบและซื้อขายผลงานศิลปะดิจิทัล
+                ที่รวบรวมผลงานจากศิลปินทั่วโลก
+              </p>
             </div>
+
+            {/* หมวดหมู่: ภาพศิลปะ */}
+            <nav aria-labelledby="footer-artworks">
+              <h3 className="mb-6 text-lg font-semibold text-[#20b256]" id="footer-artworks">
+                ภาพศิลปะ
+              </h3>
+              <ul className="space-y-3">
+                <li><a href="#" className="text-gray-300 hover:text-[#20b256] transition-colors">สำรวจภาพศิลปะ</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-[#20b256] transition-colors">สร้างผลงาน</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-[#20b256] transition-colors">การประมูล</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-[#20b256] transition-colors">หมวดหมู่</a></li>
+              </ul>
+            </nav>
+
+            {/* หมวดหมู่: ช่วยเหลือ */}
+            <nav aria-labelledby="footer-help">
+              <h3 className="mb-6 text-lg font-semibold text-[#20b256]" id="footer-help">
+                ช่วยเหลือ
+              </h3>
+              <ul className="space-y-3">
+                <li><a href="#" className="text-gray-300 hover:text-[#20b256] transition-colors">คำถามที่พบบ่อย</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-[#20b256] transition-colors">สนับสนุน</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-[#20b256] transition-colors">ติดต่อเรา</a></li>
+                <li><a href="#" className="text-gray-300 hover:text-[#20b256] transition-colors">ข้อกำหนดและเงื่อนไข</a></li>
+              </ul>
+            </nav>
+
+            {/* หมวดหมู่: ติดตามเรา */}
+            <nav aria-labelledby="footer-social">
+              <h3 className="mb-6 text-lg font-semibold text-[#20b256]" id="footer-social">
+                ติดตามเรา
+              </h3>
+              <ul className="space-y-3">
+                <li>
+                  <a href="#" className="flex items-center text-gray-300 hover:text-[#20b256] transition-colors">
+                    <Facebook className="w-5 h-5 mr-2" />
+                    <span>Facebook</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="flex items-center text-gray-300 hover:text-[#20b256] transition-colors">
+                    <Twitter className="w-5 h-5 mr-2" />
+                    <span>Twitter</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="flex items-center text-gray-300 hover:text-[#20b256] transition-colors">
+                    <Instagram className="w-5 h-5 mr-2" />
+                    <span>Instagram</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
-        <div className="border-t border-slate-900 bg-slate-700 py-4 text-sm">
-          <div className="container mx-auto px-6">
-            <div className="grid grid-cols-4 gap-6 md:grid-cols-8 lg:grid-cols-12">
-              <div className="col-span-2 md:col-span-4 lg:col-span-6">
-                Copyright 2024 Brand
-              </div>
-              <nav
-                aria-labelledby="footer-social-links-dark"
-                className="col-span-2 text-right md:col-span-4 lg:col-span-6"
-              >
-                <h2 className="sr-only" id="footer-social-links-dark">
-                  Social Media Links
-                </h2>
-                <ul className="flex items-center justify-end gap-4">
-                  <li>
-                    <Link
-                      href="/facebook"
-                      className="transition-colors duration-300 hover:text-teal-500"
-                    >
-                      {/* Facebook Icon */}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/twitter"
-                      className="transition-colors duration-300 hover:text-teal-500"
-                    >
-                      {/* Twitter Icon */}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/instagram"
-                      className="transition-colors duration-300 hover:text-teal-500"
-                    >
-                      {/* Instagram Icon */}
-                    </Link>
-                  </li>
-                </ul>
-              </nav>
+      </div>
+
+      {/* Sub Footer */}
+      <div className="py-4 text-sm border-t border-gray-800">
+        <div className="container px-6 mx-auto">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+            <div className="text-gray-400">
+              © 2024 Art Space. สงวนลิขสิทธิ์
             </div>
+            <nav aria-labelledby="subfooter-links">
+              <h3 className="sr-only" id="subfooter-links">ลิงก์กฎหมาย</h3>
+              <ul className="flex flex-wrap items-center gap-4">
+                <li><a href="#" className="text-gray-400 hover:text-[#20b256] transition-colors">ข้อกำหนดและเงื่อนไข</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-[#20b256] transition-colors">นโยบายความเป็นส่วนตัว</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-[#20b256] transition-colors">คุกกี้</a></li>
+              </ul>
+            </nav>
           </div>
         </div>
-      </footer>
-    </>
+      </div>
+    </footer>
   );
-}
+};
+
+export default Footer;
+
