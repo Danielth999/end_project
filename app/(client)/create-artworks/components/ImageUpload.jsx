@@ -17,7 +17,7 @@ export default function ImageUpload({ nftData, handleImageUpload }) {
           <div className="relative aspect-square rounded-lg overflow-hidden">
             <Image
               src={URL.createObjectURL(nftData.image)}
-              alt="NFT Artwork Preview"
+              alt="Artwork Preview"
               fill
               className="object-cover"
             />

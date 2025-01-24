@@ -52,6 +52,26 @@ const nextConfig = {
         hostname: "res.cloudinary.com", // เพิ่ม hostname ของ Cloudinary
         pathname: "/**", // อนุญาตให้ใช้ทุก path ภายใต้ hostname นี้
       },
+      {
+        protocol: "https",
+        hostname: "cdna.artstation.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pinimg.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "wallpapers.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn.pixabay.com",
+        pathname: "/**",
+      },
     ],
   },
 };

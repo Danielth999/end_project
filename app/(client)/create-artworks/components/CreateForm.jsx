@@ -154,7 +154,7 @@ export default function CreateForm({ userId }) {
                   className="w-1/2 py-4 data-[state=active]:bg-gray-800/50"
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <span className="text-lg font-semibold">ขาย NFT</span>
+                    <span className="text-lg font-semibold">ขายผลงาน</span>
                     <span className="text-sm text-gray-400">
                       ขายในราคาคงที่
                     </span>
@@ -165,7 +165,7 @@ export default function CreateForm({ userId }) {
                   className="w-1/2 py-4 data-[state=active]:bg-gray-800/50"
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <span className="text-lg font-semibold">ประมูล NFT</span>
+                    <span className="text-lg font-semibold">ประมูลผลงาน</span>
                     <span className="text-sm text-gray-400">
                       ตั้งราคาเริ่มต้นและระยะเวลา
                     </span>
@@ -214,10 +214,10 @@ export default function CreateForm({ userId }) {
                     {isLoading ? (
                       <div className="flex items-center gap-2">
                         <div className="w-5 h-5 border-t-2 border-white rounded-full animate-spin" />
-                        กำลังสร้าง NFT...
+                        กำลังสร้างผลงาน...
                       </div>
                     ) : (
-                      "สร้าง NFT"
+                      "สร้างผลงาน"
                     )}
                   </Button>
                 </div>

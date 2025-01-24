@@ -59,7 +59,7 @@ const Profile = () => {
         {/* แสดงเมนู admin เฉพาะผู้ใช้ที่มี role เป็น ADMIN */}
         {userRole === "ADMIN" && (
           <DropdownMenuItem asChild>
-            <Link href="/admin">ระบบแอดมิน</Link>
+            <Link href="/admin" target="_blank">ระบบแอดมิน</Link>
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />

@@ -30,28 +30,36 @@ const ProductsContainer = ({ userId, artworks, categories = [] }) => {
   };
 
   return (
-    <>
-      <div className="mb-10">
-        <h1 className="text-2xl font-bold">
+    <div className="p-3 sm:p-4 md:p-6 lg:p-8">
+      <div className="mb-6 sm:mb-8 lg:mb-10">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold break-words">
           {searchTerm ? (
             <>
               ผลลัพธ์การค้นหา{" "}
-              <span className="text-red-500">&quot;{searchTerm}&quot;</span> (จำนวน{" "}
-              {artworks.length} ภาพ)
+              <span className="text-red-500">&quot;{searchTerm}&quot;</span>{" "}
+              <span className="text-base sm:text-lg">
+                (จำนวน {artworks.length} ภาพ)
+              </span>
             </>
           ) : (
-            `ภาพศิลปะทั้งหมด (จำนวน ${artworks.length} ภาพ)`
+            <>
+              ภาพศิลปะทั้งหมด{" "}
+              <span className="text-base sm:text-lg">
+                (จำนวน {artworks.length} ภาพ)
+              </span>
+            </>
           )}
         </h1>
-        <div className="mt-4">
-          <label htmlFor="category" className="mr-2">
+        
+        <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-2">
+          <label htmlFor="category" className="text-sm sm:text-base">
             จัดเรียงตามหมวดหมู่:
           </label>
           <Select
             value={selectedCategory}
             onValueChange={(value) => handleCategoryChange(value)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="ทั้งหมด" />
             </SelectTrigger>
             <SelectContent>
@@ -65,12 +73,13 @@ const ProductsContainer = ({ userId, artworks, categories = [] }) => {
           </Select>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {artworks.map((item) => (
           <ProductsCard key={item.id} artWorks={item} userId={userId} />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

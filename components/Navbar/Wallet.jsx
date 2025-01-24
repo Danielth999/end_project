@@ -45,19 +45,24 @@ const WalletComponent = () => {
     );
   }
 
-  return (  
+  return (
     <div className="flex items-center gap-2">
       <Link href="/wallet">
         <Button
           variant="outline"
-          className={`text-sm font-bold rounded-full ${
+          className={`text-xs sm:text-sm h-8 sm:h-10 px-2 sm:px-4 font-bold rounded-full ${
             isValidating
               ? "bg-[#2dac5c] text-white animate-pulse"
               : "bg-[#2dac5c] text-white"
           }`}
         >
-          <Wallet size={20} />
-          {data?.walletBalance ? `${data.walletBalance} BTH` : "ไม่พบข้อมูล"}
+          <Wallet className="h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="hidden sm:inline ml-1">
+            {data?.walletBalance ? `${data.walletBalance} BTH` : "ไม่พบข้อมูล"}
+          </span>
+          <span className="sm:hidden ml-1">
+            {data?.walletBalance ? `${data.walletBalance} BTH` : "0"}
+          </span>
         </Button>
       </Link>
     </div>

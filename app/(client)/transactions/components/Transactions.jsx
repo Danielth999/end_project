@@ -171,14 +171,14 @@ export default function Transactions({ userId }) {
   }
 
   return (
-    <div className="min-h-screen w-full flex justify-center p-4">
-      <Card className="w-full bg-transparent border border-gray-600">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">รายการธุรกรรม</CardTitle>
-          <CardDescription>ประวัติการทำธุรกรรมทั้งหมดของคุณ</CardDescription>
+    <div className="min-h-screen w-full flex justify-center p-2 sm:p-4">
+      <Card className="w-full max-w-7xl bg-transparent border border-gray-600">
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="text-lg sm:text-2xl font-bold">รายการธุรกรรม</CardTitle>
+          <CardDescription className="text-xs sm:text-base">ประวัติการทำธุรกรรมทั้งหมดของคุณ</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-2 sm:p-6">
+          <div className="sm:-mx-2">
             <TransactionList
               transactions={transactions}
               onUploadSlip={handleOpenModal}

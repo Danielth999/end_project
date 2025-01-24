@@ -91,12 +91,12 @@ const ProductDetailPage = ({ artWorks, userId }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div className="min-h-screen bg-gray-900 text-white p-3 sm:p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
           {/* Image Section */}
           <div
-            className="relative w-full aspect-square rounded-lg overflow-hidden group"
+            className="relative w-full aspect-square rounded-lg overflow-hidden group shadow-xl"
             onContextMenu={preventContextMenu}
           >
             <Image
@@ -112,7 +112,7 @@ const ProductDetailPage = ({ artWorks, userId }) => {
               {Array.from({ length: 9 }).map((_, index) => (
                 <p
                   key={index}
-                  className="text-white text-4xl font-bold opacity-10 select-none flex items-center justify-center"
+                  className="text-white text-base sm:text-xl md:text-2xl lg:text-4xl font-bold opacity-10 select-none flex items-center justify-center"
                 >
                   ArtSpace
                 </p>
@@ -120,14 +120,14 @@ const ProductDetailPage = ({ artWorks, userId }) => {
             </div>
           </div>
           {/* Content Section */}
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold mb-4 text-green-500">
+          <div className="space-y-4 sm:space-y-6">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-green-500 break-words">
               {artWorks.title}
             </h1>
-            <p className="text-gray-300 mb-6 text-sm md:text-base">
+            <p className="text-gray-300 text-sm sm:text-base break-words">
               {artWorks.description}
             </p>
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 space-y-4 md:space-y-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <p className="text-sm text-gray-400">ราคาปัจจุบัน</p>
                 <p className="text-2xl font-bold text-green-500">
@@ -244,9 +244,9 @@ const ProductDetailPage = ({ artWorks, userId }) => {
               </Dialog>
             )}
             {/* Owner Info */}
-            <Card className="bg-gray-800 border-gray-700 overflow-hidden mt-8">
-              <CardContent className="p-4">
-                <div className="grid grid-cols-2 gap-4 text-sm md:text-base">
+            <Card className="bg-gray-800 border-gray-700 mt-4 sm:mt-6">
+              <CardContent className="p-3 sm:p-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
                   <div>
                     <p className="text-sm text-gray-400">ผู้สร้าง</p>
                     <Link
