@@ -6,7 +6,7 @@ import { UserRound } from 'lucide-react';
 const SignInComponent = () => {
   return (
     <>
-      <div className="sm:flex hidden flex-row justify-end gap-4 ">
+      <div className=" flex-row justify-end gap-4 ">
         <SignInButton mode="modal" className='pointer-events-auto'>
           <UserRound  />
         </SignInButton>
