@@ -42,7 +42,7 @@ export const metadata = {
       "Art Space เว็บไซต์ขายภาพวาดออนไลน์ แหล่งรวมศิลปะจากศิลปินชื่อดังและศิลปินมือใหม่",
     images: [
       {
-        url: "image/banner.webp",
+        url: "/image/banner.webp", // อัปเดต path นี้
         width: 1200,
         height: 630,
         alt: "Art Space",
@@ -54,7 +54,7 @@ export const metadata = {
     title: "Art Space - ศิลปะและภาพวาดออนไลน์",
     description:
       "Art Space เว็บไซต์ขายภาพวาดออนไลน์ แหล่งรวมศิลปะจากศิลปินชื่อดังและศิลปินมือใหม่",
-    images: ["image/banner.webp"],
+    images: ["/image/banner.webp"], // อัปเดต path นี้
   },
   metadataBase: new URL("https://www.artspaceth.online"),
   alternates: {
@@ -77,7 +77,7 @@ export default function RootLayout({ children }) {
     <ClerkProvider>
       <html
         className="scroll-smooth focus:scroll-auto"
-        lang="en"
+        lang="th" // เปลี่ยนเป็นภาษาไทย
         suppressHydrationWarning
       >
         <head>
