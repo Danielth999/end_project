@@ -1,6 +1,29 @@
 // artworks/page.jsx
-import { auth } from "@clerk/nextjs/server";
+import { Metadata } from "next";
 import ProductsContainer from "./components/Artworks.jsx";
+import { auth } from "@clerk/nextjs/server";
+
+export const metadata = {
+  title: "ผลงานศิลปะทั้งหมด | ArtSpace",
+  description:
+    "ค้นพบผลงานศิลปะดิจิทัลที่หลากหลายจากศิลปินทั่วประเทศ เลือกชมและซื้อผลงานศิลปะที่คุณชื่นชอบได้ที่ ArtSpace",
+  openGraph: {
+    title: "ผลงานศิลปะทั้งหมด | ArtSpace",
+    description: "ค้นพบผลงานศิลปะดิจิทัลที่หลากหลายจากศิลปินทั่วประเทศ",
+    url: "https://www.artspaceth.online/artworks",
+    siteName: "ArtSpace",
+    images: [
+      {
+        url: "https://www.artspaceth.online/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "ArtSpace - แกลเลอรี่ศิลปะดิจิทัล",
+      },
+    ],
+    locale: "th_TH",
+    type: "website",
+  },
+};
 
 // ฟังก์ชันสำหรับ fetch ข้อมูล artwork จาก API
 async function fetchArtworks(categoryId = null, search = null) {

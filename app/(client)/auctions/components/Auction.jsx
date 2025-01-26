@@ -10,7 +10,13 @@ import {
 } from "@/components/ui/select";
 import AuctionCard from "@/components/Auctions/AuctionCard";
 
-export default function Auction({ initialAuctionNFTs, onBidSuccess ,userId}) {
+export const metadata = {
+  title: "การประมูลสด - Art Space",
+  description: "เข้าร่วมการประมูลสดสำหรับศิลปะดิจิทัลที่ Art Space",
+  keywords: ["การประมูลสด", "ศิลปะดิจิทัล", "NFT", "Art Space"],
+};
+
+export default function Auction({ initialAuctionNFTs, onBidSuccess, userId }) {
   const [auctionNFTs, setAuctionNFTs] = useState(initialAuctionNFTs);
   const [sortOrder, setSortOrder] = useState("endingSoon");
 

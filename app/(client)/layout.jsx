@@ -22,6 +22,9 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "Art Space - ศิลปะและภาพวาดออนไลน์",
+  icons: {
+    icon: '/favicon.ico',
+  },
   description:
     "Art Space เว็บไซต์ขายภาพวาดออนไลน์ แหล่งรวมศิลปะจากศิลปินชื่อดังและศิลปินมือใหม่ ภาพวาดสวยๆ อนิเมะ การ์ตูน ภาพวาดดิจิทัล",
   keywords: [
@@ -39,7 +42,7 @@ export const metadata = {
       "Art Space เว็บไซต์ขายภาพวาดออนไลน์ แหล่งรวมศิลปะจากศิลปินชื่อดังและศิลปินมือใหม่",
     images: [
       {
-        url: "image/banner.webp", // เปลี่ยนเป็น URL ของรูปภาพที่คุณต้องการแสดงบนโซเชียลมีเดีย
+        url: "image/banner.webp",
         width: 1200,
         height: 630,
         alt: "Art Space",
@@ -51,18 +54,18 @@ export const metadata = {
     title: "Art Space - ศิลปะและภาพวาดออนไลน์",
     description:
       "Art Space เว็บไซต์ขายภาพวาดออนไลน์ แหล่งรวมศิลปะจากศิลปินชื่อดังและศิลปินมือใหม่",
-    images: ["image/banner.webp"], // เปลี่ยนเป็น URL ของรูปภาพที่คุณต้องการแสดงบน Twitter
+    images: ["image/banner.webp"],
   },
-  metadataBase: new URL("https://artspaceth.vercel.app"), // เปลี่ยนเป็นโดเมนของคุณ
+  metadataBase: new URL("https://www.artspaceth.online"),
   alternates: {
-    canonical: "https://artspaceth.vercel.app", // เปลี่ยนเป็น path ของหน้าเว็บ
+    canonical: "https://www.artspaceth.online",
   },
   other: {
     "schema:WebSite": {
-      "@context": "https://artspaceth.vercel.app",
+      "@context": "https://www.artspaceth.online",
       "@type": "WebSite",
       name: "Art Space",
-      url: "https://artspaceth.vercel.app",
+      url: "https://www.artspaceth.online",
       description:
         "Art Space เว็บไซต์ขายภาพวาดออนไลน์ แหล่งรวมศิลปะจากศิลปินชื่อดังและศิลปินมือใหม่",
     },
@@ -88,15 +91,11 @@ export default function RootLayout({ children }) {
         >
           <Provider>
             <div className="flex flex-col sm:flex-row min-h-screen">
-              {/* Sidebar (สำหรับขนาดหน้าจอใหญ่) */}
               <div className="sm:flex hidden mr-10 sm:mx-4">
                 <Sidebar />
               </div>
-              {/* เนื้อหาหลัก */}
               <div className="flex-1 mx-auto w-full max-w-[1400px]">
-                {/* Navbar */}
                 <NavMain />
-                {/* ส่วนของเนื้อหาหลัก */}
                 <main className="mt-4 sm:mt-6">
                   <Suspense fallback={<Loading />}>{children}</Suspense>
                 </main>
