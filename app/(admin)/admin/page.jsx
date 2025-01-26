@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+
 import {
   Users,
   Paintbrush as PaintBrush,
@@ -13,6 +14,7 @@ import LineChartComponent from "./components/LineChartComponent";
 const prisma = new PrismaClient();
 
 export default async function AdminDashboard() {
+  
   // ดึงข้อมูลสถิติ
   const userCount = await prisma.user.count();
   const artworkCount = await prisma.artwork.count();
