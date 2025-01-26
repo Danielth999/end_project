@@ -5,10 +5,11 @@ import fetcher from "@/lib/fetcher";
 import Loading from "@/components/Loading";
 import { useUser } from "@clerk/nextjs";
 
-
 export default function AuctionsPage() {
   const { user, isSignedIn } = useUser();
-  const userId = isSignedIn ? user.id : null;
+  const userId = isSignedIn ? user.id : null; // ประกาศ userId นอกบล็อก if
+
+
 
   const {
     data: auctionNFTs,
@@ -34,7 +35,7 @@ export default function AuctionsPage() {
 
   return (
     <Auction
-      userId={userId}
+      userId={userId} // ส่ง userId ไปยังคอมโพเนนต์ Auction
       initialAuctionNFTs={auctionNFTs}
       onBidSuccess={handleBidSuccess}
     />

@@ -10,8 +10,7 @@ import {
 } from "@/components/ui/select";
 import AuctionCard from "@/components/Auctions/AuctionCard";
 
-
-export default function Auction({ initialAuctionNFTs, onBidSuccess, userId }) {
+export default function Auction({ initialAuctionNFTs, onBidSuccess ,userId}) {
   const [auctionNFTs, setAuctionNFTs] = useState(initialAuctionNFTs);
   const [sortOrder, setSortOrder] = useState("endingSoon");
 
