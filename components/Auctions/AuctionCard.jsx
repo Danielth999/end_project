@@ -11,6 +11,7 @@ import BidDialog from "./BidDialog"
 export default function AuctionCard({ nft, onTimeUp, userId }) {
   const [currentBid, setCurrentBid] = useState(nft.currentBid)
   const [endTime, setEndTime] = useState(nft.endTime)
+  const [isBidUpdating, setIsBidUpdating] = useState(false)
   const isOwner = nft.user.id === userId
 
   useEffect(() => {
@@ -18,14 +19,20 @@ export default function AuctionCard({ nft, onTimeUp, userId }) {
 
     eventSource.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      setCurrentBid(data.currentBid)
+      if (data.currentBid !== currentBid) {
+        setIsBidUpdating(true)
+        setTimeout(() => {
+          setCurrentBid(data.currentBid)
+          setIsBidUpdating(false)
+        }, 500) // Delay updating the bid to show animation
+      }
       setEndTime(data.endTime)
     }
 
     return () => {
       eventSource.close()
     }
-  }, [nft.id])
+  }, [nft.id, currentBid])
 
   const formattedDate = nft.createdAt
     ? formatDistanceToNow(new Date(nft.createdAt), {
@@ -66,7 +73,13 @@ export default function AuctionCard({ nft, onTimeUp, userId }) {
           <h3 className="text-xl font-semibold mb-2 sm:mb-0">{nft.name}</h3>
           <div className="flex flex-col items-end">
             <p className="text-sm text-gray-400">ราคาเสนอปัจจุบัน</p>
-            <p className="text-lg font-bold text-[#2dac5c]">{currentBid} BTH</p>
+            <p
+              className={`text-lg font-bold ${
+                isBidUpdating ? "text-yellow-400 scale-110" : "text-[#2dac5c]"
+              } transition-all duration-500 ease-in-out`}
+            >
+              {currentBid} BTH
+            </p>
           </div>
         </div>
         <div className="space-y-2">
