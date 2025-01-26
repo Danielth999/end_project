@@ -124,13 +124,13 @@ export default function CreateForm({ userId }) {
         `${process.env.NEXT_PUBLIC_API_URL}/api/artworks`,
         artworkData
       );
-      toast.success("สร้าง NFT สำเร็จ!", { id: createArtworkToast });
+      toast.success("สร้าง ผลงาน สำเร็จ!", { id: createArtworkToast });
       console.log("Artwork created:", response.data);
 
       resetForm(); // รีเซ็ตฟอร์มหลังสร้างเสร็จ
     } catch (error) {
       console.error("Error creating artwork:", error);
-      toast.error("เกิดข้อผิดพลาดในการสร้าง NFT");
+      toast.error("เกิดข้อผิดพลาดในการสร้าง ผลงาน");
     } finally {
       setIsLoading(false); // ปิดสถานะโหลด
     }
