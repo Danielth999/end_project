@@ -7,9 +7,7 @@ import { useUser } from "@clerk/nextjs";
 
 export default function AuctionsPage() {
   const { user, isSignedIn } = useUser();
-  const userId = isSignedIn ? user.id : null; // ประกาศ userId นอกบล็อก if
-
-
+  const userId = isSignedIn ? user.id : null;
 
   const {
     data: auctionNFTs,
@@ -18,6 +16,10 @@ export default function AuctionsPage() {
     mutate,
   } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions`, fetcher, {
     refreshInterval: 5000,
+    revalidateOnMount: true, // ดึงข้อมูลใหม่เมื่อคอมโพเนนต์ถูกโหลด
+    revalidateOnFocus: true, // ดึงข้อมูลใหม่เมื่อผู้ใช้ focus ที่หน้าเว็บ
+    revalidateIfStale: true, // ดึงข้อมูลใหม่หากข้อมูลใน cache เก่า
+    dedupingInterval: 0, // ปิดการ deduplicate การเรียก API
   });
 
   const handleBidSuccess = async (updatedAuction) => {
@@ -26,7 +28,8 @@ export default function AuctionsPage() {
         auction.id === updatedAuction.id
           ? { ...auction, ...updatedAuction }
           : auction
-      )
+      ),
+      false // ไม่ต้อง revalidate ข้อมูลหลังจาก mutate
     );
   };
 
@@ -35,7 +38,7 @@ export default function AuctionsPage() {
 
   return (
     <Auction
-      userId={userId} // ส่ง userId ไปยังคอมโพเนนต์ Auction
+      userId={userId}
       initialAuctionNFTs={auctionNFTs}
       onBidSuccess={handleBidSuccess}
     />
