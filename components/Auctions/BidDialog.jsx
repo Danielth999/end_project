@@ -7,8 +7,7 @@ import axios from "axios"
 import toast from "react-hot-toast"
 
 export default function BidDialog({ nft, userId }) {
-  const currentBid = Math.floor(nft.currentBid || 0)
-
+  const [currentBid, setCurrentBid] = useState(Math.floor(nft.currentBid || 0))
   const [bidAmount, setBidAmount] = useState(currentBid + 1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isWinning, setIsWinning] = useState(false)
@@ -29,14 +28,22 @@ export default function BidDialog({ nft, userId }) {
   }
 
   useEffect(() => {
+    setCurrentBid(Math.floor(nft.currentBid || 0))
+  }, [nft.currentBid])
+
+  useEffect(() => {
+    setBidAmount(currentBid + 1)
+  }, [currentBid])
+
+  useEffect(() => {
     checkStatus()
-  }, [currentBid, userId, nft]) // Added nft to dependencies
+  }, [currentBid, userId, nft]) //Fixed: Added nft to the dependency array
 
   const handleBid = async () => {
     const parsedBid = Number.parseInt(bidAmount, 10)
 
-    if (isNaN(parsedBid) || parsedBid < currentBid + 1) {
-      toast.error(`ราคาที่เสนอต้องไม่น้อยกว่า ${currentBid + 1}`)
+    if (isNaN(parsedBid) || parsedBid <= currentBid) {
+      toast.error(`ราคาที่เสนอต้องมากกว่า ${currentBid} BTH`)
       return
     }
 
@@ -91,7 +98,7 @@ export default function BidDialog({ nft, userId }) {
               <input
                 type="number"
                 value={bidAmount}
-                onChange={(e) => setBidAmount(e.target.value)}
+                onChange={(e) => setBidAmount(Math.max(currentBid + 1, Number(e.target.value)))}
                 step="1"
                 min={currentBid + 1}
                 className="bg-gray-800 border-gray-700 text-white px-4 py-2 rounded"
