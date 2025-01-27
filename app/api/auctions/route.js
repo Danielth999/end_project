@@ -1,11 +1,23 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const now = new Date();
+    const now = new Date().toUTCString();
 
-    // Fetch only active auctions
+    // อัปเดตสถานะการประมูลที่หมดเวลา
+    await prisma.artwork.updateMany({
+      where: {
+        typeId: 2,
+        status: "ACTIVE",
+        auctionEndAt: { lte: now },
+      },
+      data: {
+        status: "ENDED",
+      },
+    });
+
+    // ดึงข้อมูลการประมูลที่ยังใช้งานอยู่
     const activeAuctions = await prisma.artwork.findMany({
       where: {
         typeId: 2,
@@ -21,8 +33,6 @@ export async function GET() {
         },
       },
     });
-
-    // console.log(`API: Found ${activeAuctions.length} active auctions`);
 
     const formattedAuctions = activeAuctions.map((auction) => ({
       user: {
@@ -44,7 +54,12 @@ export async function GET() {
       image: auction.imageUrl,
     }));
 
-    // Set cache control headers to prevent caching
+    // เพิ่ม timestamp ใน URL เพื่อป้องกันการ cache
+    const timestamp = Date.now();
+    const url = new URL(request.url);
+    url.searchParams.set("timestamp", timestamp);
+
+    // ตั้งค่า headers เพื่อป้องกันการ cache
     const headers = new Headers();
     headers.set(
       "Cache-Control",
@@ -58,7 +73,7 @@ export async function GET() {
       headers: headers,
     });
   } catch (error) {
-    // console.error("API Error: Failed to fetch and process auctions:", error);
+    console.error("API Error: Failed to fetch and process auctions:", error);
     return NextResponse.json(
       { error: "Failed to fetch and process auctions" },
       { status: 500 }
