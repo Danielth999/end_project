@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 
-export default function CountdownTimer({ endTime, duration, onTimeUp }) {
-  const [timeLeft, setTimeLeft] = useState(getTimeLeft(new Date(endTime)));
+export default function CountdownTimer({ endTime, onTimeUp }) {
+  const [timeLeft, setTimeLeft] = useState(getTimeLeft(endTime))
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const remainingTime = getTimeLeft(new Date(endTime));
-      setTimeLeft(remainingTime);
+      const remainingTime = getTimeLeft(endTime)
+      setTimeLeft(remainingTime)
 
       if (
         remainingTime.days === 0 &&
@@ -16,21 +16,21 @@ export default function CountdownTimer({ endTime, duration, onTimeUp }) {
         remainingTime.minutes === 0 &&
         remainingTime.seconds === 0
       ) {
-        clearInterval(timer);
-        if (onTimeUp) onTimeUp(); // เรียก callback เมื่อหมดเวลา
+        clearInterval(timer)
+        if (onTimeUp) onTimeUp()
       }
-    }, 1000);
+    }, 1000)
 
-    return () => clearInterval(timer);
-  }, [endTime, onTimeUp]);
+    return () => clearInterval(timer)
+  }, [endTime, onTimeUp])
 
   function getTimeLeft(endTime) {
-    const total = endTime.getTime() - Date.now();
-    const days = Math.floor(total / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((total / 1000 / 60) % 60);
-    const seconds = Math.floor((total / 1000) % 60);
-    return { days, hours, minutes, seconds };
+    const total = endTime.getTime() - Date.now()
+    const days = Math.max(0, Math.floor(total / (1000 * 60 * 60 * 24)))
+    const hours = Math.max(0, Math.floor((total / (1000 * 60 * 60)) % 24))
+    const minutes = Math.max(0, Math.floor((total / 1000 / 60) % 60))
+    const seconds = Math.max(0, Math.floor((total / 1000) % 60))
+    return { days, hours, minutes, seconds }
   }
 
   return (
@@ -49,7 +49,7 @@ export default function CountdownTimer({ endTime, duration, onTimeUp }) {
           <span className="font-bold">{timeLeft.seconds}</span> วิ.
         </div>
       </div>
-      <div className="text-sm text-gray-400">ระยะเวลาประมูล: {duration}</div>
     </div>
-  );
+  )
 }
+

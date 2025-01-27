@@ -2,20 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
+  console.log("API: Fetching auctions");
   try {
     const now = new Date();
-
-    // Process and update expired auctions
-    await prisma.artwork.updateMany({
-      where: {
-        typeId: 2,
-        status: "ACTIVE",
-        auctionEndAt: { lte: now },
-      },
-      data: {
-        status: "AUCTION_ENDED",
-      },
-    });
 
     // Fetch only active auctions
     const activeAuctions = await prisma.artwork.findMany({
@@ -33,6 +22,8 @@ export async function GET() {
         },
       },
     });
+
+    // console.log(`API: Found ${activeAuctions.length} active auctions`);
 
     const formattedAuctions = activeAuctions.map((auction) => ({
       user: {
@@ -68,7 +59,7 @@ export async function GET() {
       headers: headers,
     });
   } catch (error) {
-    console.error("Error fetching and processing auctions:", error);
+    console.error("API Error: Failed to fetch and process auctions:", error);
     return NextResponse.json(
       { error: "Failed to fetch and process auctions" },
       { status: 500 }

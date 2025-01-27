@@ -5,8 +5,17 @@ import useSWR from "swr"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import AuctionCard from "@/components/Auctions/AuctionCard"
 import { useRouter } from "next/navigation"
-import Loading from "@/components/Loading"
-const fetcher = (url) => fetch(url).then((res) => res.json())
+
+const fetcher = async (url) => {
+  console.log("Fetching auctions from:", url)
+  const res = await fetch(url)
+  if (!res.ok) {
+    throw new Error("An error occurred while fetching the data.")
+  }
+  const data = await res.json()
+  console.log("Fetched auctions:", data)
+  return data
+}
 
 export default function Auction({ userId }) {
   const [sortOrder, setSortOrder] = useState("endingSoon")
@@ -14,10 +23,17 @@ export default function Auction({ userId }) {
 
   const { data: auctionNFTs, error } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions`, fetcher, {
     refreshInterval: 10000, // Refresh every 10 seconds
+    revalidateOnFocus: true,
+    dedupingInterval: 5000,
   })
 
-  if (error) return <div>Failed to load auctions</div>
-  if (!auctionNFTs) return <Loading />
+  console.log("Render: Current auctions", auctionNFTs)
+
+  if (error) {
+    console.error("Error loading auctions:", error)
+    return <div>Failed to load auctions. Please try again later.</div>
+  }
+  if (!auctionNFTs) return <div>Loading auctions...</div>
 
   const sortedNFTs = [...auctionNFTs].sort((a, b) => {
     switch (sortOrder) {

@@ -10,7 +10,7 @@ import BidDialog from "./BidDialog"
 
 export default function AuctionCard({ nft, userId }) {
   const [currentBid, setCurrentBid] = useState(nft.currentBid)
-  const [endTime, setEndTime] = useState(nft.endTime)
+  const [endTime, setEndTime] = useState(new Date(nft.endTime))
   const [isBidUpdating, setIsBidUpdating] = useState(false)
   const [isExpired, setIsExpired] = useState(false)
   const isOwner = nft.user.id === userId
@@ -27,13 +27,20 @@ export default function AuctionCard({ nft, userId }) {
           setIsBidUpdating(false)
         }, 500)
       }
-      setEndTime(data.endTime)
+      setEndTime(new Date(data.endTime))
     }
 
     return () => {
       eventSource.close()
     }
   }, [nft.id, currentBid])
+
+  useEffect(() => {
+    const now = new Date()
+    if (endTime <= now) {
+      setIsExpired(true)
+    }
+  }, [endTime])
 
   const handleTimeUp = () => {
     setIsExpired(true)
@@ -92,7 +99,7 @@ export default function AuctionCard({ nft, userId }) {
           </div>
         </div>
         <div className="space-y-2">
-          <CountdownTimer endTime={endTime} duration={nft.duration} onTimeUp={handleTimeUp} />
+          <CountdownTimer endTime={endTime} onTimeUp={handleTimeUp} />
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm text-gray-400">
           <p>ศิลปิน: {nft.user?.name || "ไม่ระบุ"}</p>
