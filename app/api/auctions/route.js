@@ -3,21 +3,49 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
   try {
-    const now = new Date().toUTCString();
+    const now = new Date().toISOString(); // Use ISO format for date
 
-    // อัปเดตสถานะการประมูลที่หมดเวลา
-    await prisma.artwork.updateMany({
+    // ประมวลผลการประมูลที่หมดเวลา
+    const expiredAuctions = await prisma.artwork.findMany({
       where: {
         typeId: 2,
         status: "ACTIVE",
         auctionEndAt: { lte: now },
       },
-      data: {
-        status: "ENDED",
+      include: {
+        Bids: {
+          orderBy: { amount: "desc" },
+          take: 1,
+        },
       },
     });
 
-    // ดึงข้อมูลการประมูลที่ยังใช้งานอยู่
+    // อัปเดตสถานะการประมูลที่หมดเวลาและสร้างประวัติการประมูล
+    await Promise.all(
+      expiredAuctions.map(async (auction) => {
+        const winningBid = auction.Bids[0];
+        const updateData = { status: "AUCTION_ENDED" };
+
+        if (winningBid) {
+          await prisma.history.create({
+            data: {
+              userId: winningBid.userId,
+              artworkId: auction.id,
+              amount: winningBid.amount,
+              actionType: "BID",
+              downloadUrl: auction.imageUrl,
+            },
+          });
+        }
+
+        await prisma.artwork.update({
+          where: { id: auction.id },
+          data: updateData,
+        });
+      })
+    );
+
+    // ดึงการประมูลที่ยังเปิดใช้งานอยู่
     const activeAuctions = await prisma.artwork.findMany({
       where: {
         typeId: 2,
