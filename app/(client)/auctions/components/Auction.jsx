@@ -4,7 +4,6 @@ import { useState } from "react"
 import useSWR from "swr"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import AuctionCard from "@/components/Auctions/AuctionCard"
-import { useRouter } from "next/navigation"
 
 const fetcher = async (url) => {
   console.log("Fetching auctions from:", url)
@@ -17,14 +16,14 @@ const fetcher = async (url) => {
   return data
 }
 
-export default function Auction({ userId }) {
+export default function Auction({ userId, initialAuctions }) {
   const [sortOrder, setSortOrder] = useState("endingSoon")
-  const router = useRouter()
 
   const { data: auctionNFTs, error } = useSWR(`${process.env.NEXT_PUBLIC_API_URL}/api/auctions`, fetcher, {
     refreshInterval: 10000, // Refresh every 10 seconds
     revalidateOnFocus: true,
     dedupingInterval: 5000,
+    fallbackData: initialAuctions,
   })
 
   console.log("Render: Current auctions", auctionNFTs)
@@ -33,9 +32,8 @@ export default function Auction({ userId }) {
     console.error("Error loading auctions:", error)
     return <div>Failed to load auctions. Please try again later.</div>
   }
-  if (!auctionNFTs) return <div>Loading auctions...</div>
 
-  const sortedNFTs = [...auctionNFTs].sort((a, b) => {
+  const sortedNFTs = [...(auctionNFTs || [])].sort((a, b) => {
     switch (sortOrder) {
       case "endingSoon":
         return new Date(a.endTime).getTime() - new Date(b.endTime).getTime()
