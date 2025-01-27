@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from "react"
 import CountdownTimer from "./CountdownTimer"
 import Image from "next/image"
@@ -7,12 +8,15 @@ import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns"
 import { th } from "date-fns/locale"
 import BidDialog from "./BidDialog"
+import Link from "next/link"
+import AuctionDetailsDrawer from "./AuctionDetailsDrawer"
 
 export default function AuctionCard({ nft, userId }) {
   const [currentBid, setCurrentBid] = useState(nft.currentBid)
   const [endTime, setEndTime] = useState(new Date(nft.endTime))
   const [isBidUpdating, setIsBidUpdating] = useState(false)
   const [isExpired, setIsExpired] = useState(false)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false) // Added state for drawer
   const isOwner = nft.user.id === userId
 
   useEffect(() => {
@@ -111,11 +115,13 @@ export default function AuctionCard({ nft, userId }) {
         <Button
           variant="default"
           className="w-full sm:w-auto flex-grow bg-[#2dac5c] hover:bg-[#238c4b] transition-colors duration-300"
+          onClick={() => setIsDrawerOpen(true)}
         >
           ดูรายละเอียด
         </Button>
         {!isOwner && <BidDialog nft={{ ...nft, currentBid }} userId={userId} className="w-full sm:w-auto" />}
       </CardFooter>
+      <AuctionDetailsDrawer nft={nft} userId={userId} isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
     </Card>
   )
 }

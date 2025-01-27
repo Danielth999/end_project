@@ -20,7 +20,6 @@ async function fetchArtworkStats() {
     `${process.env.NEXT_PUBLIC_API_URL}/api/artworkStats`,
     {
       cache: "no-store", // Disable caching
-      next: { revalidate: 60 }, // Revalidate the cache every 60 seconds
     }
   );
 

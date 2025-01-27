@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  console.log("API: Fetching auctions");
   try {
     const now = new Date();
 
@@ -59,7 +58,7 @@ export async function GET() {
       headers: headers,
     });
   } catch (error) {
-    console.error("API Error: Failed to fetch and process auctions:", error);
+    // console.error("API Error: Failed to fetch and process auctions:", error);
     return NextResponse.json(
       { error: "Failed to fetch and process auctions" },
       { status: 500 }
