@@ -5,48 +5,24 @@ export async function GET() {
   try {
     const now = new Date();
 
-    // Process expired auctions
-    const expiredAuctions = await prisma.artwork.findMany({
+    // Process and update expired auctions
+    await prisma.artwork.updateMany({
       where: {
         typeId: 2,
         status: "ACTIVE",
         auctionEndAt: { lte: now },
       },
-      include: {
-        Bids: {
-          orderBy: { amount: "desc" },
-          take: 1,
-        },
+      data: {
+        status: "AUCTION_ENDED",
       },
     });
 
-    for (const auction of expiredAuctions) {
-      const winningBid = auction.Bids[0];
-
-      if (winningBid) {
-        await prisma.history.create({
-          data: {
-            userId: winningBid.userId,
-            artworkId: auction.id,
-            amount: winningBid.amount,
-            actionType: "BID",
-            downloadUrl: auction.imageUrl,
-          },
-        });
-      }
-
-      await prisma.artwork.update({
-        where: { id: auction.id },
-        data: { status: "AUCTION_ENDED" },
-      });
-    }
-
-    // Fetch active auctions
+    // Fetch only active auctions
     const activeAuctions = await prisma.artwork.findMany({
       where: {
         typeId: 2,
         status: "ACTIVE",
-        auctionEndAt: { gte: now },
+        auctionEndAt: { gt: now },
       },
       include: {
         User: true,
@@ -80,7 +56,12 @@ export async function GET() {
 
     // Set cache control headers to prevent caching
     const headers = new Headers();
-    headers.set("Cache-Control", "no-store, max-age=0");
+    headers.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+    headers.set("Pragma", "no-cache");
+    headers.set("Expires", "0");
 
     return NextResponse.json(formattedAuctions, {
       status: 200,

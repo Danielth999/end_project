@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import CountdownTimer from "./CountdownTimer"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -8,10 +8,11 @@ import { formatDistanceToNow } from "date-fns"
 import { th } from "date-fns/locale"
 import BidDialog from "./BidDialog"
 
-export default function AuctionCard({ nft, onTimeUp, userId }) {
+export default function AuctionCard({ nft, userId }) {
   const [currentBid, setCurrentBid] = useState(nft.currentBid)
   const [endTime, setEndTime] = useState(nft.endTime)
   const [isBidUpdating, setIsBidUpdating] = useState(false)
+  const [isExpired, setIsExpired] = useState(false)
   const isOwner = nft.user.id === userId
 
   useEffect(() => {
@@ -24,7 +25,7 @@ export default function AuctionCard({ nft, onTimeUp, userId }) {
         setTimeout(() => {
           setCurrentBid(data.currentBid)
           setIsBidUpdating(false)
-        }, 500) // Delay updating the bid to show animation
+        }, 500)
       }
       setEndTime(data.endTime)
     }
@@ -33,6 +34,14 @@ export default function AuctionCard({ nft, onTimeUp, userId }) {
       eventSource.close()
     }
   }, [nft.id, currentBid])
+
+  const handleTimeUp = () => {
+    setIsExpired(true)
+  }
+
+  if (isExpired) {
+    return null
+  }
 
   const formattedDate = nft.createdAt
     ? formatDistanceToNow(new Date(nft.createdAt), {
@@ -83,7 +92,7 @@ export default function AuctionCard({ nft, onTimeUp, userId }) {
           </div>
         </div>
         <div className="space-y-2">
-          <CountdownTimer endTime={endTime} duration={nft.duration} onTimeUp={onTimeUp} />
+          <CountdownTimer endTime={endTime} duration={nft.duration} onTimeUp={handleTimeUp} />
         </div>
         <div className="grid grid-cols-2 gap-2 text-sm text-gray-400">
           <p>ศิลปิน: {nft.user?.name || "ไม่ระบุ"}</p>
