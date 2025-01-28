@@ -1,4 +1,5 @@
 import ViewProfile from "../components/ViewProfile";
+import { auth } from "@clerk/nextjs/server";
 
 async function fetchUser(id) {
   const res = await fetch(
@@ -28,13 +29,14 @@ async function fetchStats(id) {
 
 export default async function Page({ params }) {
   const { id } = params;
+  const { userId } = await auth(); // ดึง userId จาก auth() ใน Server Component
 
   // Parallel fetching for better performance
   const [view, stats] = await Promise.all([fetchUser(id), fetchStats(id)]);
 
   return (
     <>
-      <ViewProfile view={view} stats={stats} />
+      <ViewProfile view={view} stats={stats} userId={userId} />
     </>
   );
 }

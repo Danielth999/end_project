@@ -4,14 +4,14 @@ import useSWR from "swr";
 import AuctionCard from "@/components/Auctions/AuctionCard";
 import fetcher from "@/lib/fetcher";
 
-const ArtworkContainer = ({ uid }) => {
+const ArtworkContainer = ({ profileId }) => {
   // ใช้ SWR ดึงข้อมูล
   const {
     data: Auction,
     error,
     isLoading,
   } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${uid}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/auctions/${profileId}`,
     fetcher,
     {
       revalidateOnFocus: true, // รีเฟรชข้อมูลเมื่อกลับมาที่หน้าจอ
@@ -42,7 +42,7 @@ const ArtworkContainer = ({ uid }) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {Auction.map((auctions) => (
-          <AuctionCard key={auctions.id} nft={auctions} userId={uid} />
+          <AuctionCard key={auctions.id} nft={auctions} profileId={profileId} />
         ))}
       </div>
     </div>

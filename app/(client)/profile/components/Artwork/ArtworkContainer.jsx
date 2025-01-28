@@ -4,14 +4,14 @@ import useSWR from "swr";
 import ArtworkCard from "@/components/Artworks/ArtworkCard";
 import fetcher from "@/lib/fetcher";
 
-const ArtworkContainer = ({ uid }) => {
+const ArtworkContainer = ({ profileId,userId }) => {
   // ใช้ SWR ดึงข้อมูล
   const {
     data: artworks,
     error,
     isLoading,
   } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/myArtwork/${uid}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/myArtwork/${profileId}`,
     fetcher,
     {
       revalidateOnFocus: true, // รีเฟรชข้อมูลเมื่อกลับมาที่หน้าจอ
@@ -40,7 +40,7 @@ const ArtworkContainer = ({ uid }) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {artworks.map((artwork) => (
-          <ArtworkCard key={artwork.id} artWorks={artwork} userId={uid} />
+          <ArtworkCard key={artwork.id} artWorks={artwork} userId={userId} />
         ))}
       </div>
     </div>

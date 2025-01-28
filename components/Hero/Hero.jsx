@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const artTerms = [
   "ศิลปะดิจิทัล",
   "ศิลปะเสมือนจริง",
-  "ดิจิทัลคอลเลกชัน",
   "อนิเมะ",
   "การ์ตูน",
   "ภาพวาด",
@@ -110,7 +109,7 @@ export default function Hero({ artworkStats }) {
 
             <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-4 sm:gap-8 md:gap-12 pt-4">
               {[
-                { label: "งานศิลปะ", value: `${artworkStats.totalArtworks}+` },
+                { label: "งานศิลปะ", value: `${artworkStats.nonAuctionCount}+` },
                 { label: "การประมูล", value: `${artworkStats.auctionCount}+` },
                 { label: "ศิลปิน", value: `${artworkStats.uniqueUserCount}+` },
                 { label: "ราคาต่ำสุด", value: `${artworkStats.minPrice} BTH` },

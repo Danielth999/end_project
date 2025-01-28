@@ -5,7 +5,7 @@ import ArtworkContainer from "./Artwork/ArtworkContainer";
 import AuctionContainer from "./Auction/AuctionContainer";
 import { useState } from "react";
 
-export default function ProfileTabs({ userId }) {
+export default function ProfileTabs({ profileId, userId }) {
   const [activeTab, setActiveTab] = useState("created");
 
   return (
@@ -35,10 +35,10 @@ export default function ProfileTabs({ userId }) {
         </TabsTrigger>
       </TabsList>
       <TabsContent value="created">
-        <ArtworkContainer uid={userId} />
+        <ArtworkContainer profileId={profileId} userId={userId} />
       </TabsContent>
       <TabsContent value="collected">
-        <AuctionContainer uid={userId} />
+        <AuctionContainer profileId={profileId} />
       </TabsContent>
     </Tabs>
   );

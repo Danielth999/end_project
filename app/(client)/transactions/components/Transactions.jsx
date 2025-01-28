@@ -167,7 +167,7 @@ export default function Transactions({ userId }) {
   }
 
   if (error) {
-    return <p className="text-center text-red-500">ไม่สามารถโหลดข้อมูลได้</p>;
+    return <p className="text-center text-red-500">ยังไม่มีรายการธุรกรรม</p>;
   }
 
   return (

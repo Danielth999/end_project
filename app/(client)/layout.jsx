@@ -85,6 +85,7 @@ export default function RootLayout({ children }) {
             name="google-site-verification"
             content="99ruTbc4vk5IxqQg5iQxnwPZ_iqwtLq2_BYSlcJ1VqE"
           />
+          
         </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-gray-900 via-gray-800`}

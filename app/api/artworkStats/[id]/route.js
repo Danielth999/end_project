@@ -18,6 +18,9 @@ export async function GET(req, { params }) {
     const totalArtworks = await prisma.artwork.count({
       where: {
         userId: id, // ใช้ userId เพื่อค้นหา Artwork ของผู้ใช้
+        typeId: {
+          not: 2, // ไม่ใช่ประเภทการประมูล (typeId != 2)
+        },
       },
     });
 

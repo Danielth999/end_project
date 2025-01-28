@@ -10,7 +10,7 @@ export default function Profile({ user, stats }) {
       <div className="container mx-auto px-4 py-8">
         <ProfileHeader user={user} />
         <ProfileStats stats={stats} />
-        <ProfileTabs userId={user.id} />
+        <ProfileTabs profileId={user.id} />
       </div>
     </div>
   );
