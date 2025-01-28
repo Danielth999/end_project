@@ -51,7 +51,7 @@ export default function WithdrawalForm({ onWithdraw, onCancel, maxAmount }) {
           max={maxAmount}
           step="0.01"
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
       </div>
       <div>
@@ -68,7 +68,7 @@ export default function WithdrawalForm({ onWithdraw, onCancel, maxAmount }) {
           value={formData.bankName}
           onChange={handleChange}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
       </div>
       <div>
@@ -81,11 +81,11 @@ export default function WithdrawalForm({ onWithdraw, onCancel, maxAmount }) {
         <input
           id="accountNumber"
           name="accountNumber"
-          type="text"
+          type="number"
           value={formData.accountNumber}
           onChange={handleChange}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full px-3 py-2 border border-gray-300 text-black rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
       </div>
       <div>
@@ -102,7 +102,7 @@ export default function WithdrawalForm({ onWithdraw, onCancel, maxAmount }) {
           value={formData.accountName}
           onChange={handleChange}
           required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
       </div>
       <div className="flex justify-end space-x-2">
