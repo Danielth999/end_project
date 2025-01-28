@@ -1,20 +1,18 @@
 // app/admin/transactions/page.js
-import { PrismaClient } from "@prisma/client";
+
 import Transactions from "./components/Transactions";
-
-const prisma = new PrismaClient();
-
+const fetchWithdrawals = async () => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/transactions/withdrawal`,
+    {
+      cache: "no-store",
+    }
+  );
+  return res.json();
+};
 export default async function TransactionsPage() {
+  const withdrawals = await fetchWithdrawals();
   // ดึงข้อมูล withdrawals จากฐานข้อมูล
-  const withdrawals = await prisma.transaction.findMany({
-    where: { transactionType: "WITHDRAWAL" },
-    take: 20,
-    orderBy: { createdAt: "desc" },
-    include: {
-      User: true,
-      BankAccount: true,
-    },
-  });
 
   return <Transactions initialWithdrawals={withdrawals} />;
 }
