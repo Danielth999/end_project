@@ -1,24 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { PrismaClient } from "@prisma/client";
 import { Search, Filter, Check, X, Edit, Trash } from "lucide-react";
 import { updateTransactionStatus, deleteTransaction } from "../actions";
 
-const prisma = new PrismaClient();
-
-export default function Transactions({ initialWithdrawals }) {
-  const [withdrawals, setWithdrawals] = useState(initialWithdrawals);
+export default function Transactions({ initialWithdrawals, mutate }) {
+  const [withdrawals, setWithdrawals] = useState(initialWithdrawals || []);
   const [editingTransaction, setEditingTransaction] = useState(null);
   const router = useRouter();
+
+  useEffect(() => {
+    if (initialWithdrawals) {
+      setWithdrawals(initialWithdrawals);
+    }
+  }, [initialWithdrawals]);
 
   const handleUpdateStatus = async (id, status) => {
     const result = await updateTransactionStatus(id, status);
     if (result.success) {
-      setWithdrawals(
-        withdrawals.map((w) => (w.id === id ? { ...w, status } : w))
+      setWithdrawals((prev) =>
+        prev.map((w) => (w.id === id ? { ...w, status } : w))
       );
+      mutate(); // Revalidate data from server
     } else {
       alert(result.message);
     }
@@ -28,7 +32,8 @@ export default function Transactions({ initialWithdrawals }) {
     if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?")) {
       const result = await deleteTransaction(id);
       if (result.success) {
-        setWithdrawals(withdrawals.filter((w) => w.id !== id));
+        setWithdrawals((prev) => prev.filter((w) => w.id !== id));
+        mutate(); // Revalidate data from server
       } else {
         alert(result.message);
       }
@@ -71,12 +76,8 @@ export default function Transactions({ initialWithdrawals }) {
                 <th className="py-3 px-4 text-left text-gray-300">ผู้ใช้</th>
                 <th className="py-3 px-4 text-left text-gray-300">จำนวนเงิน</th>
                 <th className="py-3 px-4 text-left text-gray-300">ชื่อธนาคาร</th>
-                <th className="py-3 px-4 text-left text-gray-300">
-                  เลขบัญชี
-                </th>
-                <th className="py-3 px-4 text-left text-gray-300">
-                  ชื่อบัญชี
-                </th>
+                <th className="py-3 px-4 text-left text-gray-300">เลขบัญชี</th>
+                <th className="py-3 px-4 text-left text-gray-300">ชื่อบัญชี</th>
                 <th className="py-3 px-4 text-left text-gray-300">สถานะ</th>
                 <th className="py-3 px-4 text-left text-gray-300">วันที่</th>
                 <th className="py-3 px-4 text-left text-gray-300">การดำเนินการ</th>
