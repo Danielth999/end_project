@@ -1,35 +1,9 @@
-// app/admin/transactions/actions.js
 "use server";
 
 import { PrismaClient } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
-
-// เพิ่ม Transaction
-export async function addTransaction(formData) {
-  try {
-    const userId = formData.get("userId");
-    const amount = parseFloat(formData.get("amount"));
-    const bankAccountId = formData.get("bankAccountId");
-
-    await prisma.transaction.create({
-      data: {
-        userId,
-        amount,
-        bankAccountId,
-        transactionType: "WITHDRAWAL",
-        status: "PENDING",
-      },
-    });
-
-    revalidatePath("/admin/transactions");
-    return { success: true };
-  } catch (error) {
-    console.error("Error adding transaction:", error);
-    return { success: false, message: "Failed to add transaction" };
-  }
-}
 
 // อัปเดตสถานะ Transaction
 export async function updateTransactionStatus(id, status) {

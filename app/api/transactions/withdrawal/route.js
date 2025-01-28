@@ -1,5 +1,4 @@
-import { prisma } from "@/lib/prisma"; // Prisma Client
-
+import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -16,7 +15,6 @@ export async function GET() {
 
     return NextResponse.json(withdrawals);
   } catch (error) {
-    // แสดงข้อผิดพลาด
     console.error("Error fetching withdrawals:", error);
     return NextResponse.json(
       { error: "Failed to fetch withdrawals" },

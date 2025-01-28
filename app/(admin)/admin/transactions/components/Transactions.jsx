@@ -1,44 +1,53 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Search, Filter, Check, X, Edit, Trash } from "lucide-react";
-import { updateTransactionStatus, deleteTransaction } from "../actions";
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Search, Filter, Check, X, Edit, Trash } from "lucide-react"
+import { updateTransactionStatus, deleteTransaction } from "../actions"
 
-export default function Transactions({ initialWithdrawals, mutate }) {
-  const [withdrawals, setWithdrawals] = useState(initialWithdrawals || []);
-  const [editingTransaction, setEditingTransaction] = useState(null);
-  const router = useRouter();
+export default function Transactions({ initialWithdrawals, refetchWithdrawals }) {
+  const [withdrawals, setWithdrawals] = useState(initialWithdrawals || [])
+  const [editingTransaction, setEditingTransaction] = useState(null)
+  const router = useRouter()
 
   useEffect(() => {
     if (initialWithdrawals) {
-      setWithdrawals(initialWithdrawals);
+      setWithdrawals(initialWithdrawals)
     }
-  }, [initialWithdrawals]);
+  }, [initialWithdrawals])
 
   const handleUpdateStatus = async (id, status) => {
-    const result = await updateTransactionStatus(id, status);
+    const result = await updateTransactionStatus(id, status)
     if (result.success) {
-      setWithdrawals((prev) =>
-        prev.map((w) => (w.id === id ? { ...w, status } : w))
-      );
-      mutate(); // Revalidate data from server
+      setWithdrawals((prev) => prev.map((w) => (w.id === id ? { ...w, status } : w)))
+      refetchWithdrawals()
     } else {
-      alert(result.message);
+      alert(result.message)
     }
-  };
+  }
 
   const handleDeleteTransaction = async (id) => {
     if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?")) {
-      const result = await deleteTransaction(id);
+      const result = await deleteTransaction(id)
       if (result.success) {
-        setWithdrawals((prev) => prev.filter((w) => w.id !== id));
-        mutate(); // Revalidate data from server
+        setWithdrawals((prev) => prev.filter((w) => w.id !== id))
+        refetchWithdrawals()
       } else {
-        alert(result.message);
+        alert(result.message)
       }
     }
-  };
+  }
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault()
+    const result = await updateTransactionStatus(editingTransaction.id, editingTransaction.status)
+    if (result.success) {
+      setEditingTransaction(null)
+      refetchWithdrawals()
+    } else {
+      alert(result.message)
+    }
+  }
 
   return (
     <div className="text-gray-100">
@@ -85,66 +94,47 @@ export default function Transactions({ initialWithdrawals, mutate }) {
             </thead>
             <tbody>
               {withdrawals.map((withdrawal) => (
-                <tr
-                  key={withdrawal.id}
-                  className="border-b border-gray-700 hover:bg-gray-700/50"
-                >
+                <tr key={withdrawal.id} className="border-b border-gray-700 hover:bg-gray-700/50">
                   <td className="py-3 px-4">{withdrawal.id.slice(0, 8)}...</td>
-                  <td className="py-3 px-4">
-                    {withdrawal.User?.email || "ไม่ทราบ"}
-                  </td>
-                  <td className="py-3 px-4">
-                    {Number(withdrawal.amount).toFixed(2)} บาท
-                  </td>
-                  <td className="py-3 px-4">
-                    {withdrawal.BankAccount?.bankName || "N/A"}
-                  </td>
-                  <td className="py-3 px-4">
-                    {withdrawal.BankAccount?.accountNumber || "N/A"}
-                  </td>
-                  <td className="py-3 px-4">
-                    {withdrawal.BankAccount?.accountName || "N/A"}
-                  </td>
+                  <td className="py-3 px-4">{withdrawal.User?.email || "ไม่ทราบ"}</td>
+                  <td className="py-3 px-4">{Number(withdrawal.amount).toFixed(2)} บาท</td>
+                  <td className="py-3 px-4">{withdrawal.BankAccount?.bankName || "N/A"}</td>
+                  <td className="py-3 px-4">{withdrawal.BankAccount?.accountNumber || "N/A"}</td>
+                  <td className="py-3 px-4">{withdrawal.BankAccount?.accountName || "N/A"}</td>
                   <td className="py-3 px-4">
                     <span
                       className={`px-2 py-1 rounded-full text-xs ${
                         withdrawal.status === "COMPLETED"
                           ? "bg-green-500/20 text-green-400"
                           : withdrawal.status === "PENDING"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : withdrawal.status === "FAILED"
-                          ? "bg-red-500/20 text-red-400"
-                          : "bg-gray-500/20 text-gray-400"
+                            ? "bg-yellow-500/20 text-yellow-400"
+                            : withdrawal.status === "FAILED"
+                              ? "bg-red-500/20 text-red-400"
+                              : "bg-gray-500/20 text-gray-400"
                       }`}
                     >
                       {withdrawal.status === "COMPLETED"
                         ? "สำเร็จ"
                         : withdrawal.status === "PENDING"
-                        ? "รอดำเนินการ"
-                        : withdrawal.status === "FAILED"
-                        ? "ล้มเหลว"
-                        : "ยกเลิก"}
+                          ? "รอดำเนินการ"
+                          : withdrawal.status === "FAILED"
+                            ? "ล้มเหลว"
+                            : "ยกเลิก"}
                     </span>
                   </td>
-                  <td className="py-3 px-4">
-                    {new Date(withdrawal.createdAt).toLocaleString()}
-                  </td>
+                  <td className="py-3 px-4">{new Date(withdrawal.createdAt).toLocaleString()}</td>
                   <td className="py-3 px-4">
                     {withdrawal.status === "PENDING" && (
                       <>
                         <button
-                          onClick={() =>
-                            handleUpdateStatus(withdrawal.id, "COMPLETED")
-                          }
+                          onClick={() => handleUpdateStatus(withdrawal.id, "COMPLETED")}
                           className="text-green-400 hover:text-green-300 mr-2"
                           title="ทำเครื่องหมายว่าสำเร็จ"
                         >
                           <Check size={20} />
                         </button>
                         <button
-                          onClick={() =>
-                            handleUpdateStatus(withdrawal.id, "FAILED")
-                          }
+                          onClick={() => handleUpdateStatus(withdrawal.id, "FAILED")}
                           className="text-red-400 hover:text-red-300 mr-2"
                           title="ทำเครื่องหมายว่าล้มเหลว"
                         >
@@ -178,13 +168,7 @@ export default function Transactions({ initialWithdrawals, mutate }) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">แก้ไขรายการ</h2>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                // Handle edit submission here
-                setEditingTransaction(null);
-              }}
-            >
+            <form onSubmit={handleEditSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">จำนวนเงิน</label>
                 <input
@@ -194,7 +178,7 @@ export default function Transactions({ initialWithdrawals, mutate }) {
                   onChange={(e) =>
                     setEditingTransaction({
                       ...editingTransaction,
-                      amount: parseFloat(e.target.value),
+                      amount: Number.parseFloat(e.target.value),
                     })
                   }
                   className="w-full bg-gray-700 text-white px-3 py-2 rounded"
@@ -226,10 +210,7 @@ export default function Transactions({ initialWithdrawals, mutate }) {
                 >
                   ยกเลิก
                 </button>
-                <button
-                  type="submit"
-                  className="bg-purple-600 px-4 py-2 rounded"
-                >
+                <button type="submit" className="bg-purple-600 px-4 py-2 rounded">
                   บันทึกการเปลี่ยนแปลง
                 </button>
               </div>
@@ -238,5 +219,6 @@ export default function Transactions({ initialWithdrawals, mutate }) {
         </div>
       )}
     </div>
-  );
+  )
 }
+
