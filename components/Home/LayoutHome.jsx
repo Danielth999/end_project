@@ -7,7 +7,7 @@ async function fetchUsers() {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users/artists`,
     {
-      next: { revalidate: 60 }, // Revalidate the cache every 60 seconds
+      cache: "no-store", // Disable caching
     }
   );
 
