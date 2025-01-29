@@ -142,13 +142,13 @@ export default function Hero({ artworkStats }) {
                   bg: "bg-orange-500",
                   delay: 0.4,
                   imageUrl:
-                    "https://images.unsplash.com/photo-1728922236580-e242f44ed978?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8ZGlnaXRhbCUyMGFydHxlbnwwfHwwfHx8Mg%3D%3D",
+                    "https://images.unsplash.com/photo-1728922372615-97d606f8000a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGRpZ2l0YWwlMjBhcnR8ZW58MHx8MHx8fDI%3D",
                 },
                 {
                   bg: "bg-green-500",
                   delay: 0.6,
                   imageUrl:
-                    "https://images.unsplash.com/photo-1728922372615-97d606f8000a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGRpZ2l0YWwlMjBhcnR8ZW58MHx8MHx8fDI%3D",
+                    "https://images.unsplash.com/photo-1728922184607-86dce3fa8e6e?q=80&w=1934&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                 },
               ].map((card, index) => (
                 <motion.div
