@@ -5,9 +5,31 @@ import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
-// อัปเดตสถานะ Transaction
 export async function updateTransactionStatus(id, status) {
   try {
+    const transaction = await prisma.transaction.findUnique({
+      where: { id },
+    });
+
+    if (!transaction) {
+      return { success: false, message: "Transaction not found" };
+    }
+
+    // คืนเงินให้ผู้ใช้ถ้าสถานะเป็น FAILED หรือ CANCELLED
+    if (
+      transaction.transactionType === "WITHDRAWAL" &&
+      (status === "FAILED" || status === "CANCELLED")
+    ) {
+      await prisma.user.update({
+        where: { id: transaction.userId },
+        data: {
+          walletBalance: {
+            increment: transaction.amount,
+          },
+        },
+      });
+    }
+
     await prisma.transaction.update({
       where: { id },
       data: { status },
@@ -21,15 +43,18 @@ export async function updateTransactionStatus(id, status) {
   }
 }
 
-// ลบ Transaction
 export async function deleteTransaction(id) {
   try {
     const transaction = await prisma.transaction.findUnique({
       where: { id },
     });
 
+    if (!transaction) {
+      return { success: false, message: "Transaction not found" };
+    }
+
+    // คืนเงินให้ผู้ใช้เมื่อมีการลบคำขอถอนเงิน
     if (transaction.transactionType === "WITHDRAWAL") {
-      // คืนเงินให้ผู้ใช้
       await prisma.user.update({
         where: { id: transaction.userId },
         data: {
@@ -40,9 +65,7 @@ export async function deleteTransaction(id) {
       });
     }
 
-    await prisma.transaction.delete({
-      where: { id },
-    });
+    await prisma.transaction.delete({ where: { id } });
 
     revalidatePath("/admin/transactions");
     return { success: true };

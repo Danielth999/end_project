@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-
+import { revalidatePath } from "next/cache";
 import {
   Users,
   Paintbrush as PaintBrush,
@@ -14,45 +14,57 @@ import LineChartComponent from "./components/LineChartComponent";
 const prisma = new PrismaClient();
 
 export default async function AdminDashboard() {
-  
-  // ดึงข้อมูลสถิติ
-  const userCount = await prisma.user.count();
-  const artworkCount = await prisma.artwork.count();
-  const pendingWithdrawals = await prisma.transaction.count({
-    where: { transactionType: "WITHDRAWAL", status: "PENDING" },
-  });
-  const totalSales = await prisma.transaction.aggregate({
-    where: { transactionType: "DEPOSIT" },
-    _sum: { amount: true },
-  });
-  const activeAuctions = await prisma.artwork.count({
-    where: {
-      status: "ACTIVE",
-      auctionEndAt: { gt: new Date() },
-    },
-  });
+  // ป้องกันการแคช
+  revalidatePath("/dashboard");
 
-  // ดึงข้อมูลสำหรับกราฟ
-  const artworkData = await prisma.$queryRaw`
-    SELECT 
-      TO_CHAR("createdAt", 'Mon') AS month,
-      COUNT(*) AS artworks
-    FROM "Artwork"
-    GROUP BY TO_CHAR("createdAt", 'Mon')
-    ORDER BY MIN("createdAt")
-  `;
+  // ดึงข้อมูลสถิติจากฐานข้อมูล
+  const [
+    userCount,
+    artworkCount,
+    pendingWithdrawals,
+    totalSales,
+    activeAuctions,
+    artworkData,
+    salesData,
+  ] = await Promise.all([
+    prisma.user.count(),
+    prisma.artwork.count(),
+    prisma.transaction.count({
+      where: { transactionType: "WITHDRAWAL", status: "PENDING" },
+    }),
+    prisma.history.aggregate({
+      where: {
+        actionType: "PURCHASE",
+        amount: { not: null },
+      },
+      _sum: { amount: true },
+    }),
+    prisma.artwork.count({
+      where: {
+        status: "ACTIVE",
+        auctionEndAt: { gt: new Date() },
+      },
+    }),
+    prisma.$queryRaw`
+        SELECT 
+          TO_CHAR("createdAt", 'Mon') AS month,
+          COUNT(*) AS artworks
+        FROM "Artwork"
+        GROUP BY TO_CHAR("createdAt", 'Mon')
+        ORDER BY MIN("createdAt")
+      `,
+    prisma.$queryRaw`
+        SELECT 
+          TO_CHAR("createdAt", 'Mon') AS month,
+          SUM("amount") AS sales
+        FROM "History"
+        WHERE "actionType" = 'PURCHASE' 
+        GROUP BY TO_CHAR("createdAt", 'Mon')
+        ORDER BY MIN("createdAt")
+      `,
+  ]);
 
-  const salesData = await prisma.$queryRaw`
-    SELECT 
-      TO_CHAR("createdAt", 'Mon') AS month,
-      SUM("amount") AS sales
-    FROM "Transaction"
-    WHERE "transactionType" = 'DEPOSIT'
-    GROUP BY TO_CHAR("createdAt", 'Mon')
-    ORDER BY MIN("createdAt")
-  `;
-
-  // แปลงข้อมูลให้อยู่ในรูปแบบที่กราฟใช้ได้
+  // แปลงข้อมูลให้เหมาะกับการแสดงผลกราฟ
   const monthMap = {
     Jan: "ม.ค.",
     Feb: "ก.พ.",
@@ -78,7 +90,7 @@ export default async function AdminDashboard() {
     sales: Number(item.sales),
   }));
 
-  // ข้อมูลสถิติ
+  // ข้อมูลสถิติที่ใช้แสดงในแดชบอร์ด
   const stats = [
     {
       title: "จำนวนผู้ใช้ทั้งหมด",

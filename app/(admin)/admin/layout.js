@@ -8,10 +8,12 @@ import {
   History,
   ShoppingCart,
   Settings,
+  Home,
 } from "lucide-react";
 import "../../globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 const menuItems = [
+  { href: "/", icon: Home, label: "Home" },
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/users", icon: UserCircle, label: "Users" },
   { href: "/admin/artworks", icon: PaintBrush, label: "Artworks" },

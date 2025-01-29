@@ -1,5 +1,5 @@
 // artworks/page.jsx
-import { Metadata } from "next";
+
 import ProductsContainer from "./components/Artworks.jsx";
 import { auth } from "@clerk/nextjs/server";
 

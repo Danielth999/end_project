@@ -43,7 +43,7 @@ export default function WalletManagement({ userId, initialBalance }) {
       const result = await response.json();
       setBalance(result.updatedUser.walletBalance);
       setShowWithdrawal(false);
-      toast.success("Withdrawal successful");
+      toast.success("สร้างรายการถอนเงินสำเร็จ");
     } catch (error) {
       toast.error(error.message);
     }

@@ -8,6 +8,8 @@ import { updateTransactionStatus, deleteTransaction } from "../actions"
 export default function Transactions({ initialWithdrawals, refetchWithdrawals }) {
   const [withdrawals, setWithdrawals] = useState(initialWithdrawals || [])
   const [editingTransaction, setEditingTransaction] = useState(null)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [filterStatus, setFilterStatus] = useState("all")
   const router = useRouter()
 
   useEffect(() => {
@@ -17,26 +19,24 @@ export default function Transactions({ initialWithdrawals, refetchWithdrawals })
   }, [initialWithdrawals])
 
   const handleUpdateStatus = async (id, status) => {
-    const result = await updateTransactionStatus(id, status)
+    const result = await updateTransactionStatus(id, status);
     if (result.success) {
-      setWithdrawals((prev) => prev.map((w) => (w.id === id ? { ...w, status } : w)))
-      refetchWithdrawals()
+      refetchWithdrawals(); // ดึงข้อมูลใหม่ทันที
     } else {
-      alert(result.message)
+      alert(result.message);
     }
-  }
-
+  };
+  
   const handleDeleteTransaction = async (id) => {
     if (confirm("คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?")) {
-      const result = await deleteTransaction(id)
+      const result = await deleteTransaction(id);
       if (result.success) {
-        setWithdrawals((prev) => prev.filter((w) => w.id !== id))
-        refetchWithdrawals()
+        refetchWithdrawals(); // ดึงข้อมูลใหม่หลังจากลบ
       } else {
-        alert(result.message)
+        alert(result.message);
       }
     }
-  }
+  };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault()
@@ -48,6 +48,17 @@ export default function Transactions({ initialWithdrawals, refetchWithdrawals })
       alert(result.message)
     }
   }
+
+  const filteredWithdrawals = withdrawals.filter(withdrawal => {
+    const matchesSearchQuery = withdrawal.User?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                               withdrawal.BankAccount?.bankName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                               withdrawal.BankAccount?.accountNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                               withdrawal.BankAccount?.accountName?.toLowerCase().includes(searchQuery.toLowerCase())
+
+    const matchesStatus = filterStatus === "all" || withdrawal.status === filterStatus
+
+    return matchesSearchQuery && matchesStatus
+  })
 
   return (
     <div className="text-gray-100">
@@ -63,11 +74,17 @@ export default function Transactions({ initialWithdrawals, refetchWithdrawals })
               type="text"
               placeholder="ค้นหาคำขอถอนเงิน..."
               className="bg-transparent border-none focus:outline-none text-gray-100 px-3 w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div className="flex items-center gap-2">
             <Filter size={20} className="text-gray-400" />
-            <select className="bg-gray-700 text-gray-100 rounded-lg px-3 py-2 focus:outline-none">
+            <select 
+              className="bg-gray-700 text-gray-100 rounded-lg px-3 py-2 focus:outline-none"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
               <option value="all">สถานะทั้งหมด</option>
               <option value="PENDING">รอดำเนินการ</option>
               <option value="COMPLETED">สำเร็จ</option>
@@ -93,7 +110,7 @@ export default function Transactions({ initialWithdrawals, refetchWithdrawals })
               </tr>
             </thead>
             <tbody>
-              {withdrawals.map((withdrawal) => (
+              {filteredWithdrawals.map((withdrawal) => (
                 <tr key={withdrawal.id} className="border-b border-gray-700 hover:bg-gray-700/50">
                   <td className="py-3 px-4">{withdrawal.id.slice(0, 8)}...</td>
                   <td className="py-3 px-4">{withdrawal.User?.email || "ไม่ทราบ"}</td>
@@ -221,4 +238,3 @@ export default function Transactions({ initialWithdrawals, refetchWithdrawals })
     </div>
   )
 }
-

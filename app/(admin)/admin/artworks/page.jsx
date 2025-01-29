@@ -3,10 +3,17 @@ import { ImagePlus, Search, Filter, DollarSign, Gavel } from "lucide-react";
 
 const prisma = new PrismaClient();
 
-export default async function ArtworksPage() {
+export default async function ArtworksPage({ searchParams }) {
+  const { search, category, type } = searchParams;
+
   const artworks = await prisma.artwork.findMany({
     take: 20,
     orderBy: { createdAt: "desc" },
+    where: {
+      title: search ? { contains: search, mode: "insensitive" } : undefined,
+      categoryId: category ? category : undefined,
+      artworkTypeId: type ? type : undefined,
+    },
     include: { User: true, Category: true, ArtworkType: true },
   });
 
@@ -25,18 +32,24 @@ export default async function ArtworksPage() {
 
       <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
         <div className="p-4 border-b border-gray-700 flex justify-between items-center flex-wrap gap-4">
-          <div className="flex items-center bg-gray-700 rounded-lg px-3 py-2 w-full max-w-md">
+          <form className="flex items-center bg-gray-700 rounded-lg px-3 py-2 w-full max-w-md">
             <Search size={20} className="text-gray-400" />
             <input
               type="text"
+              name="search"
               placeholder="ค้นหาผลงานศิลปะ..."
               className="bg-transparent border-none focus:outline-none text-gray-100 px-3 w-full"
+              defaultValue={search}
             />
-          </div>
+          </form>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <Filter size={20} className="text-gray-400" />
-              <select className="bg-gray-700 text-gray-100 rounded-lg px-3 py-2 focus:outline-none">
+              <select
+                name="category"
+                className="bg-gray-700 text-gray-100 rounded-lg px-3 py-2 focus:outline-none"
+                defaultValue={category}
+              >
                 <option value="">หมวดหมู่ทั้งหมด</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -47,7 +60,11 @@ export default async function ArtworksPage() {
             </div>
             <div className="flex items-center gap-2">
               <Filter size={20} className="text-gray-400" />
-              <select className="bg-gray-700 text-gray-100 rounded-lg px-3 py-2 focus:outline-none">
+              <select
+                name="type"
+                className="bg-gray-700 text-gray-100 rounded-lg px-3 py-2 focus:outline-none"
+                defaultValue={type}
+              >
                 <option value="">ประเภททั้งหมด</option>
                 {artworkTypes.map((type) => (
                   <option key={type.id} value={type.id}>
@@ -56,6 +73,12 @@ export default async function ArtworksPage() {
                 ))}
               </select>
             </div>
+            <button
+              type="submit"
+              className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg"
+            >
+              ค้นหา
+            </button>
           </div>
         </div>
 
@@ -72,9 +95,7 @@ export default async function ArtworksPage() {
                   ราคา/ราคาเริ่มต้น
                 </th>
                 <th className="py-3 px-4 text-left text-gray-300">สถานะ</th>
-                <th className="py-3 px-4 text-left text-gray-300">
-                  การดำเนินการ
-                </th>
+               
               </tr>
             </thead>
             <tbody>
@@ -122,7 +143,7 @@ export default async function ArtworksPage() {
                       }`}
                     >
                       {artwork.status === "ACTIVE"
-                        ? "ใช้งาน"
+                        ? "ประกาศขาย"
                         : artwork.status === "AUCTION_ENDED"
                         ? "ประมูลสิ้นสุด"
                         : artwork.status === "SOLD"
@@ -130,11 +151,7 @@ export default async function ArtworksPage() {
                         : "ไม่ทราบสถานะ"}
                     </span>
                   </td>
-                  <td className="py-3 px-4">
-                    <button className="text-red-400 hover:text-red-300">
-                      ลบ
-                    </button>
-                  </td>
+                 
                 </tr>
               ))}
             </tbody>

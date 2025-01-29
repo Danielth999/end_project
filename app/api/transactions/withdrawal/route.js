@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic"; // บังคับให้ API ทำงานแบบ dynamic
+
 export async function GET() {
   try {
     const withdrawals = await prisma.transaction.findMany({
       where: { transactionType: "WITHDRAWAL" },
-      take: 20,
       orderBy: { createdAt: "desc" },
       include: {
         User: true,
@@ -13,7 +14,9 @@ export async function GET() {
       },
     });
 
-    return NextResponse.json(withdrawals);
+    return NextResponse.json(withdrawals, {
+      headers: { "Cache-Control": "no-store" },
+    });
   } catch (error) {
     console.error("Error fetching withdrawals:", error);
     return NextResponse.json(
